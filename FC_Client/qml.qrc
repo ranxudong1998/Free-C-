@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Fc_chat_dialog.qml</file>
+        <file>backup.qml</file>
+        <file>Fc_log_up.qml</file>
+        <file>Fc_main.qml</file>
+    </qresource>
+</RCC>
