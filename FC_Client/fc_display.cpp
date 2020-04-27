@@ -32,8 +32,8 @@ void FC_Display::show(){
     this->_engine = new QQmlApplicationEngine;
     this->_engine->rootContext()->setContextProperty("message_listModel",this->_list_model);
     this->_engine->rootContext()->setContextProperty("profile",this->_profile);
-//    this->_engine->load(QUrl(QStringLiteral("qrc:/Fc_log_up.qml")));
-    this->_engine->load(QUrl(QStringLiteral("qrc:/Fc_main.qml")));
+    this->_engine->load(QUrl(QStringLiteral("qrc:/Fc_log_up.qml")));
+//    this->_engine->load(QUrl(QStringLiteral("qrc:/Fc_main.qml")));
     this->_app_ui->exec();
 }
 void FC_Display::recv(QString s){

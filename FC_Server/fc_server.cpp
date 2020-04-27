@@ -43,6 +43,13 @@ void FC_Server::erase_connection(FC_Connection* connection){
         if(_connected[i]==connection){
             std::swap(_connected[i],_connected[_connected.size()-1]);
             _connected.erase(_connected.end()-1);
+            break;
+        }
+    }
+    for(auto i=_identified.begin();i!=_identified.end();++i){
+        if(i->second == connection){
+            _identified.erase(i);
+            break;
         }
     }
     delete connection;
@@ -56,8 +63,10 @@ void FC_Server::forward_message(FC_Message* msg){
 }
 void FC_Server::forward_message(QString id,FC_Message* msg){
     for (auto i=_identified.begin();i!=_identified.end();++i) {
-        if(i->first!=id)
-            i->second->write(msg);
+        if(i->first!=id){
+            FC_Message* tmp_msg = new FC_Message(*msg);
+            i->second->write(tmp_msg);
+        }
     }
 }
 

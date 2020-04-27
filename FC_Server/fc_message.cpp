@@ -1,7 +1,7 @@
 #include "fc_message.h"
 #include <cstdlib>
 #include <cstring>
-
+#include <QDebug>
 //==============================================
 //  public function
 //==============================================
@@ -13,14 +13,17 @@ FC_Message::FC_Message()
 //    this->_message_type = 0;
     this->_data = (char *)malloc(FC_MESSAGE_HEADER_LENGTH+1);
     memset(this->_data,'\0',FC_MESSAGE_HEADER_LENGTH+1);
+    qDebug() << "Construct Message" ;
 }
 FC_Message::FC_Message(const FC_Message& msg){
     this->_data = (char *)malloc(header_length());
     memcpy(this->_data,msg._data,header_length());
     this->set_body_length(this->body_length());
     memcpy(this->_data,msg._data,mess_length());
+    qDebug() << "Copy Construct Message" ;
 }
 FC_Message::~FC_Message(){
+    qDebug() << "Deconstruct Message" ;
     free(this->_data);
 }
 
@@ -30,7 +33,7 @@ unsigned FC_Message::header_length()const{
 }
 unsigned FC_Message::body_length()const{
     unsigned body_length = 0;
-    memcpy(&body_length,this->_data+sizeof (unsigned),sizeof (unsigned));
+    memcpy(&body_length,this->_data+sizeof (unsigned int),sizeof(unsigned  int));
     return body_length;
 }
 unsigned FC_Message::mess_length()const{
