@@ -48,7 +48,7 @@ Page {
                             height: 110
                             width: 110
                             sourceSize: Qt.size(width, height)
-                            source: constant.testPic
+                            source: profilemsg.heading
                         }
 
                         ColumnLayout {
@@ -63,12 +63,6 @@ Page {
                                 font.pointSize: constant.normalFontPointSize
                                 font.family: "微软雅黑"
                                 color: "#888"
-                                Connections{
-                                    target: profile
-                                    onAccontChanged:{
-                                        console.log("account changed!")
-                                    }
-                               }
                             }
                         }
 

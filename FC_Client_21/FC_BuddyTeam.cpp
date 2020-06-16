@@ -20,6 +20,7 @@ QQmlListProperty<BuddyItem> BuddyTeam::buddys()
 void BuddyTeam::appendItem(BuddyItem * p)
 {
     m_items.append(p);
+//    emit buddysChanged();
 }
 
 int BuddyTeam::itemCount() const

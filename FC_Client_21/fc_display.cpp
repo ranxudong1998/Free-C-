@@ -7,6 +7,7 @@
 #include "FC_BuddyModel.h"
 #include "FC_BuddyItem.h"
 #include "FC_BuddyTeam.h"
+#include "fc_buddy.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml/QtQml>
@@ -24,6 +25,7 @@ FC_Display::FC_Display(FC_Client* client,FC_Profile* profile)
     _model = BuddyModel::getInstance();
     _handle = new FC_Message_Handle (client);
     _profile = new FC_Profile (client);
+    _buddy = Buddy::getInstance();
 
 }
 FC_Display::~FC_Display(){
@@ -47,6 +49,8 @@ void FC_Display::show(){
     _engine->rootContext()->setContextProperty("teamModel",_model);
     _engine->rootContext()->setContextProperty("profile_handle",_profile);
     _engine->rootContext()->setContextProperty("profilemsg",_profilemsg);
+    _engine->rootContext()->setContextProperty("buddy",_buddy);
     this->_engine->load(QUrl(QStringLiteral("qrc:/qml/Fc_MainWindow.qml")));
+//    this->_engine->load(QUrl(QStringLiteral("qrc:/Login.qml")));
     this->_app_ui->exec();
 }

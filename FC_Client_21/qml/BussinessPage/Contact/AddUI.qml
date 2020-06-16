@@ -122,12 +122,6 @@ Page{
                     id:findClick
                     anchors.fill: parent
                     onClicked: {
-//                        console.log(textInputSearch.text)
-//                        console.log("Friends click")
-//                        var component = Qt.createComponent("FriendsMessage.qml");
-//                        if(component.status === Component.Ready){
-//                            var object=component.createObject(addui);
-//                        }
                         message_handle.search_friends(textInputSearch.text)
                         __PushPage(Qt.resolvedUrl("./FriendsMessage.qml"), {} ); //压入一个新的界面
                     }

@@ -82,7 +82,7 @@
                 height: 54
                 anchors.horizontalCenterOffset: 118
                 fillMode: Image.PreserveAspectFit
-                source: "../../../../asserts/logo.jpg"
+                source: profilemsg.heading
             }
 
             Label {

@@ -152,6 +152,16 @@ std::unordered_map<std::string, FC_Connection *> FC_Server::get_onlineP()
     return this->_onlineP;
 }
 
+unordered_map<std::string, vector<FC_Message *> > FC_Server::get_offlineM()
+{
+    return this->_offlineM;
+}
+
+void FC_Server::set_offlineM(const std::string &acc, FC_Message *msg)
+{
+    this->_offlineM[acc].push_back(msg);
+}
+
 //==============================================
 //  private function
 //==============================================

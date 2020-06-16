@@ -12,7 +12,7 @@ ProfileMsg *ProfileMsg::getInstance()
 void ProfileMsg::setAccount(const QString &acc)
 {
     m_account = acc;
-//    emit accountChanged();
+    emit accountChanged(); //必须要有信号，QML端才能即时的检测信号是否被更改
 }
 
 void ProfileMsg::setNickname(const QString &nick)
@@ -30,6 +30,24 @@ void ProfileMsg::setGender(const QString &gender)
     }
 }
 
+void ProfileMsg::setHeading(const QString &heading)
+{
+    if( m_heading != heading)
+    {
+        m_heading = heading;
+        emit headingChanged();
+    }
+}
+
+void ProfileMsg::setSign(const QString &sign)
+{
+    if(m_sign != sign)
+    {
+        m_sign = sign;
+        emit signChanged();
+    }
+}
+
 QString ProfileMsg::account() const
 {
     return m_account;
@@ -43,6 +61,16 @@ QString ProfileMsg::nickname() const
 QString ProfileMsg::gender() const
 {
     return m_gender;
+}
+
+QString ProfileMsg::heading() const
+{
+    return  m_heading;
+}
+
+QString ProfileMsg::sign() const
+{
+    return m_sign;
 }
 
 ProfileMsg::ProfileMsg(QObject *parent)

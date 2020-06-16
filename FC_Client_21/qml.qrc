@@ -133,7 +133,6 @@
         <file>asserts/add1.jpg</file>
         <file>asserts/find.jpg</file>
         <file>asserts/logo.jpg</file>
-        <file>asserts/OIP.3Ip43tY9ILB9LNJSafgvrwAAAA.jpg</file>
         <file>asserts/return.jpg</file>
         <file>asserts/right.jpg</file>
         <file>qml/BussinessPage/Personal/Settings/UpdateSex.qml</file>
@@ -147,5 +146,9 @@
         <file>qml/BussinessPage/Contact/MessagePage.qml</file>
         <file>qml/BussinessPage/Contact/UpdateRemarkDialog.qml</file>
         <file>qml/BussinessPage/UpdateRemarkDialog.qml</file>
+        <file>qml/resource/icons/label-icons/new-fri.png</file>
+        <file>qml/resource/icons/label-icons/groupchat.png</file>
+        <file>qml/resource/icons/label-icons/right.png</file>
+        <file>qml/BussinessPage/Contact/NewFriendsPage.qml</file>
     </qresource>
 </RCC>

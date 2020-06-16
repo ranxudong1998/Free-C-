@@ -38,9 +38,12 @@ public:
     //profile about
     void add_identified(string,FC_Connection*);
 
+    //setter getter
     void set_accounts(const string& acc,const string& pass);
     std::unordered_map<std::string,std::string> get_accounts();
     std::unordered_map<std::string,FC_Connection*> get_onlineP();
+    unordered_map<string,vector<FC_Message*>> get_offlineM();
+    void set_offlineM(const string& acc,FC_Message* msg);
 
     void init_accounts();
     bool login_verify(const string& acc,const string& pass);
@@ -56,10 +59,10 @@ public:
 private:
     FC_Thread_Pool* _thread_pool = nullptr;
     FC_Acceptor* _accrptor = nullptr;
-    vector<FC_Connection*> _connected; //connected but not identify
+    vector<FC_Connection*> _connected; //connected but not identify,这个主要是用于群聊
     std::unordered_map<std::string,FC_Connection*> _onlineP; //所有的在线好友信息connected and identified;
     std::unordered_map<std::string,std::string> _accounts;//用户账户信息列表
-//    unordered_map<QString,FC_Connection*> _identified;//connected and identified;
+    unordered_map<string,vector<FC_Message*>> _offlineM;//离线消息队列
 };
 
 #endif // FC_SERVER_H

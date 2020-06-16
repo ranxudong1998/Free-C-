@@ -1,6 +1,8 @@
 #ifndef FC_HEADER_H
 #define FC_HEADER_H
 
+//#include <filesystem>
+//namespace fs = std::filesystem;
 //==============================================
 //  Network protocol design
 //==============================================
@@ -8,8 +10,14 @@
     const unsigned FC_PROFILE = 1<<29;
     const unsigned FC_SIGN_IN = FC_PROFILE | 1<<3;
  */
+
+
+////当前配置文件所处位置
+//#define FC_CONFG_FILE fs::current_path().string()
 //most body length
 #define FC_MESSAGE_BODY_LENGTH 1024
+//message header
+#define FC_MESSAGE_HEADER_LENGTH 8
 
 
 //part one -- message about

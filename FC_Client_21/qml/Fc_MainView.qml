@@ -16,7 +16,6 @@ Page {
         id: topBar
         RowLayout {
             anchors.fill: parent
-            // spacing: 20
             Label {
                 Layout.leftMargin: 20
                 text: title

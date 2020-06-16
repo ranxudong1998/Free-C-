@@ -7,8 +7,8 @@ import "../../Component"
 
 Page{
     id: element
-    width: 420
-    height: 800
+    width: 360
+    height: 720
     //屏蔽父对象的鼠标事件
 
     MouseArea{
@@ -19,79 +19,89 @@ Page{
         anchors.topMargin: 0
         anchors.fill: parent
     }
-    Image {
-        id: image
-        x: 0
-        y: 8
-        width: 32
+    Rectangle{
+        id:one
         height: 32
-        fillMode: Image.PreserveAspectFit
-        source: "../../../asserts/return.jpg"
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                try { stackView.pop(); }  catch(e) { }
+        width: parent.width
+        Image {
+            id: image
+            x: 0
+            y: 8
+            width: 32
+            height: parent.height
+            fillMode: Image.PreserveAspectFit
+            source: "../../../asserts/return.jpg"
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    try { stackView.pop(); }  catch(e) { }
+                }
             }
         }
     }
+
 
 
     //repeater留下来当扩展
 //    Repeater {
 //       model:buddys
 
-       Rectangle{
-           id:rect
-           width: 420
-           height: 120
-           anchors.top: image.bottom
-           Rectangle {
-               id: fileicon
-               width: 80
-               height: 80
-               radius: 50
-               color:"yellow"
-               anchors{
-                   left: parent.left
-                   leftMargin: 20
-                   verticalCenter: parent.verticalCenter
-               }
+    Rectangle {
+        anchors.top: one.bottom
+        width: parent.width
+        height: rowLayout1.height + 10
 
-               //使其位于margin
-           }
-           Column{
-               anchors{
-                   left: fileicon.right
-                   leftMargin: 20
-                   top: parent.top
-                   topMargin:20
-               }
-               spacing: 10
+        RowLayout {
+            id: rowLayout1
+            width: parent.width
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 10
 
-               Label{
-                   id:account
-                   text: qsTr("@12345")
-               }
-               Label{
-                   id:nick
-                   text: qsTr("Gftae")
-                   color: "grey"
-               }
-           }
-       }
+            Item {  width: parent.spacing;  height: parent.height }
 
-//    }
+            Image {
+                height: 110
+                width: 110
+                sourceSize: Qt.size(width, height)
+                source: buddy.heading
+            }
+
+            ColumnLayout {
+                Layout.fillHeight: true
+                Label {
+                    text: buddy.nickname
+                    font.family: "微软雅黑"
+                    font.pointSize: constant.normalFontPointSize
+                }
+                Label {
+                    id:acc
+                    text: buddy.account
+                    font.pointSize: constant.normalFontPointSize
+                    font.family: "微软雅黑"
+                    color: "#888"
+                }
+            }
+
+            Item { Layout.fillWidth: true }
+        }
+    }
+    Separator {
+        color: "black"
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+    }
     Button{
         id:addFriendButton
+        x: 0
+        y: 190
         text: "添加好友"
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 0
+        anchors.bottomMargin: 490
         width: parent.width
         onClicked: {
             console.log("add Friends")
-            message_handle.add_friends("@12345")
+            message_handle.add_friends(acc.text)
             //请求添加为好友的信息
-
         }
     }
 

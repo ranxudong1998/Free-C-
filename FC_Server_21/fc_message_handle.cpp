@@ -61,7 +61,7 @@ void FC_Message_Handle::handle_body(FC_Message* message){
             break;
         case FC_FRIENDS_SEARCH:
             std::cout<<"查询好友信息"<<std::endl;
-            friends_search_handle(message->body());
+            friends_search_handle(message->body()); //传入消息body
             break;
         case FC_FRIENDS_ADD:
             cout<<"add friends"<<endl;
@@ -106,14 +106,12 @@ void FC_Message_Handle::send_self_msg(const string &username)
     std::string str ;
     str = make_json_user(username);
 
-//    cout<<str<<endl;
     FC_Message* msg = new FC_Message;
     msg->set_message_type(FC_SELF_MES);
 
     clog << "make_json::body_size():" << str.size() << endl;
     msg->set_body_length(str.size());
     msg->set_body(str.c_str(),str.size());
-//    _connection->write(msg);
     _server->forward_message(username,msg);
 }
 
@@ -160,7 +158,10 @@ string FC_Message_Handle::make_json(string username)
             subitem.put("nickname",item.value(1).toString().toStdString());
             subitem.put("markname",group.value(3).toString().toStdString());
             subitem.put("sign",item.value(3).toString().toStdString());
-            subitem.put("heading",item.value(2).toString().toStdString());
+            string filepath = item.value(2).toString().toStdString();//得到相应的文件路径
+            string content = handle_user_head(filepath); //处理头像函数
+            subitem.put("heading",content); //发送用户头像二进制文件
+//            subitem.put("heading",item.value(2).toString().toStdString()); //这里发送的是路径，现在需要对其进行修改
             subitem.put("gender",item.value(4).toString().toStdString());
 
             members.push_back(make_pair("",subitem));
@@ -185,15 +186,22 @@ string FC_Message_Handle::make_json_user(const string &username)
     QSqlQuery qu =_broker->get_user_msg(QString::fromStdString(username));
     qu.next();
 
-    ptree writeroot,writeitem;
+    ptree writeroot;
+    //还需要传入account nickname  heading sign gender
+    string filepath = qu.value(2).toString().toStdString();//得到相应的文件路径
+
+    string content = handle_user_head(filepath); //处理头像函数
+
     writeroot.put("account",qu.value(0).toString().toStdString());
     writeroot.put("nickname",qu.value(1).toString().toStdString());
+    writeroot.put("heading",content);
+    writeroot.put("sign",qu.value(3).toString().toStdString());
     writeroot.put("gender",qu.value(4).toString().toStdString());
 
     std::stringstream ss;
     boost::property_tree::write_json(ss, writeroot);
     std::string strContent = ss.str();
-    delete _broker;
+    delete _broker; //释放空间
     return strContent;
 }
 
@@ -240,7 +248,6 @@ void FC_Message_Handle::update_gender(const char *s)
         msg->set_message_type(FC_UPDATE_SEX);
         msg->set_body_length(strlen(content));
         msg->set_body(content,strlen(content));
-//        do_write(msg);
         _server->forward_message(account,msg);
     }
     else
@@ -253,33 +260,38 @@ void FC_Message_Handle::update_gender(const char *s)
 
 void FC_Message_Handle::friends_search_handle(const char *s)
 {
+
     FC_Message* message = new FC_Message;
-    message->set_message_type(FC_FRIENDS_SEARCH_R);
+    message->set_message_type(FC_FRIENDS_SEARCH_R); //返回查找好友列表
+    //先判断是否在accounts中，如果在的话，在判断是否在在线列表中，若在的话直接发送，不再的话就发送在离线列表中，等用户上线
     if(_server->get_accounts().count(s) !=0 && _server->get_onlineP()[s] != _connection) //condition is error
     {
        DbBroker* broker = new DbBroker ();
        QSqlQuery query =  broker->get_user_msg(QString::fromStdString(s)); //得到用户信息
        query.next();
-       std::string username = query.value(0).toString().toStdString();
+       ptree writeroot;
+
+       std::string username = query.value(0).toString().toStdString(); //返回给客户端帐号，昵称，以及用户头像
        std::string nick = query.value(1).toString().toStdString();
-       char* acc = new char[username.size()+1];
-       memset(acc,'\0',username.size()+1);
-       strcpy(acc,username.c_str());
+       std::string filepath = query.value(2).toString().toStdString();
+       string content = handle_user_head(filepath); //处理头像函数
 
-       char* nickname = new char[nick.size()+1];
-       memset(nickname,'\0',nick.size()+1);
-       strcpy(nickname,nick.c_str());
+       writeroot.put("account",username);
+       writeroot.put("nickname",nick);
+       writeroot.put("heading",content);
 
-       strcpy(acc+FC_ACC_LEN,nickname);
-       message->set_body(acc,strlen(acc));
-       delete [] acc;
-       delete [] nickname;
+       std::stringstream ss;
+       boost::property_tree::write_json(ss, writeroot);
+       std::string strContent = ss.str();
+       message->set_body_length(strContent.size());
+       message->set_body(strContent.c_str(),strContent.size());
+
        delete broker;
     }
     else
     { //not exist
         cout<<"not exist"<<endl;
-        message->set_message_type(FC_FRIENDS_SEARCH_R);
+//        message->set_message_type(FC_FRIENDS_SEARCH_R);
 
         std::string msg = "error";
         char* buff = (char*)malloc(msg.size()+1);
@@ -291,19 +303,30 @@ void FC_Message_Handle::friends_search_handle(const char *s)
         free(buff);
     }
     _connection->write(message);
+
 }
 
 void FC_Message_Handle::add_friends(FC_Message *msg)
 {
-    char* sd = msg->get_self_identify();
+    //这接消息转发给了服务端
+    char* sd = msg->get_self_identify();//添加好友端的标识
     char* rv = msg->get_friends_identify(); //发送给好友的id
+
+    std::string str ;
+    str = make_json_user(sd);
 
     FC_Message* message = new FC_Message;
     message->set_message_type(FC_FRIENDS_ADD);
-    message->set_body_length(strlen(sd));
-    message->set_body(sd,strlen(sd));
+    message->set_body_length(str.size()); //发送了用户相关的所有信息
+    message->set_body(str.c_str(),str.size());
 
-    _server->forward_message(rv,message);
+    if(_server->get_onlineP().count(rv) !=0) //对方在线
+        _server->forward_message(rv,message);
+    else
+        _server->set_offlineM(rv,message);
+
+    cout<<"get_offlineM().size():"<<_server->get_offlineM().size()<<std::endl;
+
 }
 
 void FC_Message_Handle::add_friends_lists(FC_Message *msg)
@@ -317,7 +340,12 @@ void FC_Message_Handle::add_friends_lists(FC_Message *msg)
         std::cout<<"add_friends_lists: success"<<endl;
     }
     //send message to client
+
     delete broker;
+    std::string str ;
+    str = make_json_user(two); //查询好友的用户信息
+    msg->set_body_length(str.size());
+    msg->set_body(str.c_str(),str.size());
     _server->forward_message(one,msg);
 }
 
@@ -355,6 +383,18 @@ void FC_Message_Handle::handle_remark(const char *s)
     }
 }
 
+void FC_Message_Handle::handle_offlineM(const string &acc)
+{
+    //处理离线消息
+    if(_server->get_offlineM().count(acc) !=0 )
+    {
+        for(const auto &each : _server->get_offlineM()[acc]) //输出相应的消息容器
+        {
+            _server->forward_message(acc,each);
+        }
+    }
+}
+
 
 //==============================================
 //  private function
@@ -379,7 +419,10 @@ void FC_Message_Handle::handle_sign_in(const char* s){
     {
         this->_server->add_identified(account,this->_connection); //添加在在线列表中
 //        send_self_msg(account);
+        send_self_msg(account);
         send_friends_lists(account);
+        handle_offlineM(account);
+//        send_friends_lists(account);
     }else
     {
         std::cout<<"login failed"<<std::endl;
@@ -397,4 +440,28 @@ void FC_Message_Handle::handle_text_msg(FC_Message* msg){
 //    this->_server->forward_message(QString(s_account),msg);
     std::cout<< s_account<<std::endl;
     std::cout<<content<<std::endl;
+}
+
+std::string FC_Message_Handle::handle_user_head(const string &filepath)
+{
+    // 1. 打开图片文件
+    ifstream is(filepath, ifstream::in | ios::binary);
+
+    if(!is.is_open())
+    {
+        cout<<"open failed"<<endl;
+        exit(0);
+    }
+    // 2. 计算图片长度
+    is.seekg(0, is.end);
+    int length = is.tellg();
+    is.seekg(0, is.beg);
+    // 3. 创建内存缓存区
+    char * buffer = new char[length];
+    // 4. 读取图片
+    is.read(buffer, length);
+    string content(buffer,length);
+    is.close();
+    delete [] buffer;
+    return content;
 }

@@ -9,6 +9,9 @@
 #include "fc_header.h"
 #include <QDebug>
 #include <iostream>
+#include <fstream>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 using namespace boost::property_tree;
 
@@ -127,6 +130,8 @@ void FC_Profile::parser_json(const std::string &content)
       Json::Reader reader;
       std::string acc;
       std::string nick;
+      std::string heading;
+      std::string sign;
       std::string sex;
       if(!reader.parse(content, root)){
         std::cout <<"failed" <<std::endl;
@@ -135,15 +140,31 @@ void FC_Profile::parser_json(const std::string &content)
           acc = root["account"].asString();
           nick = root["nickname"].asString();
           sex = root["gender"].asString();
+          sign = root["sign"].asString();
+          heading = root["heading"].asString();
       }
+
+      //保存在配置文件中
+      _client->save_user_head(acc,heading);
+
+      //得到整体当前文件所属的位置
+
+      fs::path p = fs::current_path(); //目的是为了得到相对路径
+
+      string path = "file://"+p.string()+"/assert/"+acc+".jpg";
 
       QString account = QString::fromLocal8Bit(acc.c_str());
       QString nickname = QString::fromLocal8Bit(nick.c_str());
       QString gender = QString::fromLocal8Bit(sex.c_str());
+      QString signv = QString::fromLocal8Bit(sign.c_str());
+      QString headpath = QString::fromLocal8Bit(path.c_str());
+
 
       _profile->setAccount(account);
       _profile->setNickname(nickname);
       _profile->setGender(gender);
+      _profile->setHeading(headpath);
+      _profile->setSign(signv);
 }
 
 void FC_Profile::sendsignal()

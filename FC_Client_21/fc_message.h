@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include "fc_header.h"
 
-#define FC_MESSAGE_HEADER_LENGTH 8
 /*
  * 消息包括消息头部和消息body
  * 	消息头部包括消息类型和消息body的大小

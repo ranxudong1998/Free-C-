@@ -17,7 +17,8 @@
 class BuddyModel : public QObject
 {
   Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<BuddyTeam> teams READ teams)
+//    Q_PROPERTY(QQmlListProperty<BuddyTeam> teams READ teams )
+    Q_PROPERTY(QQmlListProperty<BuddyTeam> teams READ teams NOTIFY teamsChanged)
 public:
     static BuddyModel* getInstance();
     QQmlListProperty<BuddyTeam> teams();
@@ -26,7 +27,8 @@ public:
     BuddyTeam *team(int)const;
     void clearTeams();
 
-
+signals:
+    void teamsChanged(); //定义一个信号 当发生改变时，会通知QML端进行更改
 private:
     static BuddyModel* instance;
 

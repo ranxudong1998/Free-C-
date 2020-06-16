@@ -37,7 +37,7 @@ public:
 
     void setTeamname(const QString& str);
     void setTeamId(const int& id);
-//signals:
+signals:
 //    void teamChanged();
 //    void buddysChanged();
 private:

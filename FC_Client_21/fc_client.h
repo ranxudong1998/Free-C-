@@ -4,6 +4,7 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 #include <string>
+#include <json/json.h>
 
 using boost::thread;
 using std::string;
@@ -35,7 +36,8 @@ public:
 
     //friends about
     void json_data_parser_self(const std::string& content);
-    void json_data_parser();
+    void json_data_parser(); //这是使用boost json来存数据 但是不可以解析二进制数据，所以目前采用cppjson来存储
+    void parser_friends_json(const std::string& content);
     void test_data();
 
     void update_nick(const std::string& nick);
@@ -49,6 +51,7 @@ public:
 
     FC_BuddyListCtrl* get_buddy_list();
     void forward_message(FC_Message* msg);
+    void save_user_head(const std::string& acc,const string& heading);
 private:
     FC_Connection* _connections = nullptr;//connect to server
     FC_Display* _display = nullptr;//user interface

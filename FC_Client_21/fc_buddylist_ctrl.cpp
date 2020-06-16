@@ -304,9 +304,15 @@ void FC_BuddyListCtrl::addBuddyModel()
             BuddyItem* item = new BuddyItem();
             string account = this->GetBuddyItemAccNum(i,j);
             string nickName = this->GetBuddyItemMarkName(i,j);
+            string heading = this->GetBuddyItemHeading(i,j);
+            string gender = this->GetBuddyItemGender(i,j);
+            string sign = this->GetBuddyItemSignName(i,j);
 
             item->setAccount(QString::fromLocal8Bit(account.c_str()));
             item->setNickname(QString::fromLocal8Bit(nickName.c_str()));
+            item->setHeading(QString::fromLocal8Bit(heading.c_str()));
+            item->setGender(QString::fromLocal8Bit(gender.c_str()));
+            item->setSign(QString::fromLocal8Bit(sign.c_str()));
             item->setItemId(j);
             team->appendItem(item);
 
@@ -314,5 +320,6 @@ void FC_BuddyListCtrl::addBuddyModel()
         }
          model->appendTeam(team);
     }
+    emit model->teamsChanged();
 }
 

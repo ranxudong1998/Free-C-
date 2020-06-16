@@ -10,6 +10,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 using namespace boost::property_tree;
 //==============================================
@@ -66,12 +68,27 @@ void FC_Client::json_data_parser_self(const string &content)
 
 //得到服务端的解析信息
 
+//这个做法不采用
 void FC_Client::json_data_parser()
 {
     const string file_path = "friends_list.json";
     ptree root;
     ptree items;
-    read_json<boost::property_tree::ptree>(file_path,root);
+
+    try
+    {
+        read_json<boost::property_tree::ptree>(file_path,root);
+    }
+    catch (boost::property_tree::ptree_bad_path& e)
+    {
+        cout <<"boost::property_tree::ptree_bad_path:"<<e.what();
+        exit(0);
+    }
+    catch (boost::property_tree::ptree_bad_data& e)
+    {
+        cout <<"boost::property_tree::ptree_bad_data:"<<e.what();
+    }
+
     cout<<root.get<string>("username")<<endl;
     items = root.get_child("group");
     cout<<"items: "<<items.size()<<endl;
@@ -91,19 +108,70 @@ void FC_Client::json_data_parser()
             int m_id = _buddy_list->GetBuddyItemCount(n_id);
             _buddy_list->AddBuddyItem(n_id,m_id);  //这个
 
+            string acc = lit->second.get<string>("account");
 //            //添加一个新成员后，会增加一个成员信息
             _buddy_list->SetBuddyTeamMaxCnt(n_id,m_id+1);
-            _buddy_list->SetBuddyItemAccNum(n_id,m_id,lit->second.get<string>("account"));
+            _buddy_list->SetBuddyItemAccNum(n_id,m_id,acc);
             _buddy_list->SetBuddyItemNickName(n_id,m_id,lit->second.get<string>("nickname"));
             _buddy_list->SetBuddyItemMarkName(n_id,m_id,lit->second.get<string>("markname"));
             _buddy_list->SetBuddyItemSign(n_id,m_id,lit->second.get<string>("sign"));
-            _buddy_list->SetBuddyItemHeadPic(n_id,m_id,lit->second.get<string>("heading"));
+
+//            save_user_head(acc,lit->second.get<string>("heading"));
+
+//            fs::path p = fs::current_path(); //目的是为了得到相对路径
+
+//            string path = "file://"+p.string()+"/assert/"+acc+".jpg";
+//            _buddy_list->SetBuddyItemHeadPic(n_id,m_id,path);
+//            _buddy_list->SetBuddyItemHeadPic(n_id,m_id,lit->second.get<string>("heading"));
             _buddy_list->SetBuddyItemGender(n_id,m_id,lit->second.get<string>("gender"));
         }
     }
     _buddy_list->addBuddyModel();
     //移除这个文件，暂时不移动
-    remove(file_path.c_str());
+    //    remove(file_path.c_str());
+}
+
+void FC_Client::parser_friends_json(const string &content)
+{
+    Json::Reader reader;
+    Json::Value root;
+    // reader将Json字符串解析到root，root将包含Json里所有子元素
+    if (reader.parse(content, root))
+    {
+        cout<<"root asString():"<<root["username"].asString()<<endl;
+        Json::Value items  = root["group"];
+        for(int i=0;i<items.size();i++)
+        {
+            int n_id = _buddy_list->GetBuddyTeamCount();
+            _buddy_list->AddBuddyTeam(n_id);
+            //设置团队名字
+            _buddy_list->SetBuddyTeamName(n_id,items[i]["teamname"].asString());
+            cout<<items[i]["teamname"].asString()<<endl;
+            Json::Value item = items[i]["members"];
+            for(int j=0;j<item.size();j++)
+            {
+                int m_id = _buddy_list->GetBuddyItemCount(n_id);
+                _buddy_list->AddBuddyItem(n_id,m_id);  //这个
+
+                string acc = item[j]["account"].asString();
+    //            //添加一个新成员后，会增加一个成员信息
+                _buddy_list->SetBuddyTeamMaxCnt(n_id,m_id+1);
+                _buddy_list->SetBuddyItemAccNum(n_id,m_id,acc);
+                _buddy_list->SetBuddyItemNickName(n_id,m_id,item[j]["nickname"].asString());
+                _buddy_list->SetBuddyItemMarkName(n_id,m_id,item[j]["markname"].asString());
+                _buddy_list->SetBuddyItemSign(n_id,m_id,item[j]["sign"].asString());
+
+                save_user_head(acc,item[j]["heading"].asString());
+
+                fs::path p = fs::current_path(); //目的是为了得到相对路径
+
+                string path = "file://"+p.string()+"/assert/"+acc+".jpg";
+                _buddy_list->SetBuddyItemHeadPic(n_id,m_id,path);
+                _buddy_list->SetBuddyItemGender(n_id,m_id,item[j]["gender"].asString());
+            }
+        }
+    }
+     _buddy_list->addBuddyModel();
 }
 
 void FC_Client::test_data()
@@ -150,6 +218,22 @@ void FC_Client::forward_message(FC_Message *msg)
     this->_connections->write(msg);
     delete msg;
 
+}
+
+void FC_Client::save_user_head(const string &acc,const string& heading)
+{
+    //保存在配置文件中
+
+    std::string filepath = "./assert/"+acc+".jpg";
+
+    std::ofstream fout(filepath, std::ios::binary);
+    if(!fout)
+    {
+        std::cout<<"open failed";
+        exit(0);
+    }
+    fout.write(heading.data(), heading.size());
+    fout.close();
 }
 
 

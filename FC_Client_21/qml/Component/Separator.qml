@@ -16,7 +16,7 @@ import QtQuick 2.0
 Rectangle {
     id:separator
     property int orientation : Qt.Vertical // Qt.Horizontal
-    property int length:orientation == Qt.Vertical ? parent.height*0.6 : parent.width*0.6
+    property int length:orientation == Qt.Vertical ? parent.height*0.8 : parent.width*0.8
     property int separatorWidth : 1
 
     onOrientationChanged: __fix();

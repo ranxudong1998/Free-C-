@@ -40,11 +40,15 @@ public:
      void delete_friend(FC_Message* msg);
      void handle_remark(const char* s);
 
+     //handle offline
+     void handle_offlineM(const string& acc);
+
 private:
     void handle_ordinary_msg(FC_Message*);
     void handle_sign_in(const char* s);
     void handle_text_msg(FC_Message*);
 
+    string handle_user_head(const string& filepath);
 private:
 //    DbBroker* _broker = nullptr;
     FC_Server* _server = nullptr;

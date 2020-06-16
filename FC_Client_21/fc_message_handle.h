@@ -26,15 +26,20 @@ public:
     void registered(); //register
     Q_INVOKABLE void search_friends(const QString& friendsAccount);
     Q_INVOKABLE void add_friends(const QString &msg);
-    Q_INVOKABLE void add_friends_result(const char* accout,const QString &msg);
     Q_INVOKABLE void update_remark(const int &team,const int &item,const QString &user);
     Q_INVOKABLE void delete_friend(const int &team,const int &item);
+    Q_INVOKABLE void validation_request(const QString& result);
 
     void update_remark(char* content);
     void displaytoQML(FC_Message* message);
+    void refresh_friends_list(const string& msg);
 
+
+signals:
+    void addFriendSignal(const QString& value);
 private:
-    void search_show(char* msg);
+    void search_show(const string& msg);
+    void add_friends_show(const string& msg);
 
     char* text_content(const char* account,const char* pass);
     std::string QStrTostr(QString& qstr);

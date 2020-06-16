@@ -10,6 +10,7 @@ class FC_Message_Handle;
 class FC_Profile;
 class ProfileMsg;
 class BuddyModel;
+class Buddy;
 
 class FC_Display
 {
@@ -26,6 +27,7 @@ private:
     ProfileMsg* _profilemsg=nullptr;
     BuddyModel* _model = nullptr;
     FC_Message_Handle* _handle = nullptr;
+    Buddy* _buddy = nullptr;
 
     QGuiApplication* _app_ui = nullptr;
     QQmlApplicationEngine* _engine = nullptr;
