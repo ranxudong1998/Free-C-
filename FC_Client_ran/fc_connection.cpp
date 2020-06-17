@@ -131,7 +131,6 @@ void FC_Connection::on_read_body(const boost::system::error_code&err){
         //here use the same message to receive new message.
         this->_message_handle->handle_body(this->_recv_message);
         this->read_header();
-
         char* tmp=(char*)malloc(100);
         memset(tmp,'\0',100);
         memcpy(tmp,this->_recv_message->body(),_recv_message->body_length());

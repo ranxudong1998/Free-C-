@@ -19,7 +19,7 @@ Page {
         width: contactsView.width
         height: contactsView.height
         //model: contactsItemsModel
-        model: 20
+        model: contactsItemsModel  //item数量
         add: Transition {
             NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
             NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 400 }
@@ -67,21 +67,29 @@ Page {
         }
 
         delegate: ColumnLayout {
+            id:columnlayout
             width: contactsView.width
             height: 70
             IconLabel {
+                id:inconlabel
                 spacing: 10
                 Layout.fillWidth: true;
                 height: 70
                 iconWidth: headPrtraitSize
                 iconHeight: headPrtraitSize
                 iconSource: constant.testPic
-                labelText: "Ran"
+                labelText: name
                 fontPointSize: constant.normalFontPointSize
+
+
+
                 onPressAndHold: {
                     menu.chatItemIndex = index;
                     menu.popup();
                 }
+
+
+                //分割线
                 Separator {
                     color: "#666"; orientation: Qt.Horizontal ;
                     length: parent.width * 0.8
@@ -91,7 +99,8 @@ Page {
 
                 onClicked: {
                     console.log("go to the person profile");
-                    __PushPage(Qt.resolvedUrl("./ProfilePage.qml"));
+                    __LoadProfilePage(id, name)
+                 //   __PushPage(Qt.resolvedUrl("./ProfilePage.qml"));
                 }
             }
 
@@ -108,9 +117,42 @@ Page {
             }
         }
 
+
+
         ListModel {
+
             id: contactsItemsModel
+
+            Component.onCompleted: {
+
+                contactsItemsModel.append(
+                            {"name":"ran1",
+                             "id":"11111111"
+                            });
+
+                contactsItemsModel.append(
+                            {"name":"ran2",
+                             "id":"11111112"
+                            });
+
+                contactsItemsModel.append(
+                            {"name":"ran3",
+                             "id":"11111113"
+                            });
+
+                contactsItemsModel.append(
+                            {"name":"ran4",
+                             "id":"11111114"
+                            });
+
+            }
         }
+    }
+    function __LoadProfilePage(userid, username){
+        if(1+1==2){
+        __PushPage(Qt.resolvedUrl("./ProfilePage.qml"),
+                   {s_userid:userid,s_username: username } );}
+
     }
 
 }

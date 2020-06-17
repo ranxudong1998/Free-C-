@@ -5,6 +5,9 @@ import QtQuick.Layouts 1.1
 import "../Component"
 
 Page {
+
+    property string s_username
+    property string s_userid
     id: profilePage
     title: qsTr("Profile") // 个人简介页面
     color: "#ebebeb"
@@ -120,7 +123,7 @@ Page {
                                 spacing: 10
                                 Label {
                                     id: personName
-                                    text: "Xu"
+                                    text: s_username
                                     font.family: "微软雅黑"
                                 }
                                 Image {
@@ -131,7 +134,7 @@ Page {
                                 }
                             }
                             Label {
-                                text: "ID: " + profile.account
+                                text: s_userid
                                 font.family: "微软雅黑"
                                 color: "#888"
                             }
@@ -267,7 +270,10 @@ Page {
                     buttonSize: constant.bigFontPointSize
                     onClicked: {
                         // stackView.pop();
-                        __PushPage(Qt.resolvedUrl("./Chat/ChatPage.qml"), {username: "Xu"});
+                        message_listModel.set_currentChatId(s_userid+profile.account);
+                        //message_listModel.loadMsg(s_userid+profile.account);
+                        __PushPage(Qt.resolvedUrl("./Chat/ChatPage.qml"),
+                                   {s_username: s_username,s_userid:s_userid});
                     }
                 }
 

@@ -12,6 +12,7 @@ Page {
     signal openNewChat(int s_userid, string s_username)
 
     onOpenNewChat: {
+
         if(__find(s_userid) !== null) {
             // go to the chat page
             __LoadChatPage(s_userid, s_username);
@@ -21,8 +22,10 @@ Page {
                             "chatName":s_username,
                             "chatContext":s_userid
                         });
+
             // go to the chat page
             __LoadChatPage(s_userid, s_username);
+
         }
     }
 
@@ -81,6 +84,7 @@ Page {
             position: listView.visibleArea.yPosition
             pageSize: listView.visibleArea.heightRatio
         }
+
 
         delegate: Rectangle {
             id: chatItem
@@ -208,7 +212,7 @@ Page {
                     chatItemsModel
                     .append(
                          {
-                             "name":"Ran: "+i,
+                             "name":"Ran: ",
                              "chatName":""+i,
                              "chatContext": i
                          });
@@ -234,6 +238,7 @@ Page {
 
         __PushPage(Qt.resolvedUrl("./Chat/ChatPage.qml"),
                    {s_userid:s_userid,s_username: s_username } );
+
 
     }
 

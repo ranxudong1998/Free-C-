@@ -14,9 +14,15 @@ public:
     int rowCount() const; //row count
     QHash<int, QByteArray> roleNames() const;
 
+
     //transfer function
     void add(QVector<QString> content);//display to socket
     void recv(QVector<QString> content);//socket to display
+
+    void add_msg_to_socket(QVector<QString> content);
+    void clearMsg();
+    
+    
 private:
     QHash<int, QByteArray> _roles;//store rolename
     QVector<QVector<QString>> _data; //store message

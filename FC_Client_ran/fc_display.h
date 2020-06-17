@@ -8,6 +8,7 @@ class QQmlApplicationEngine;
 class FC_Client;
 class FC_Message_ListModel;
 class FC_Profile;
+class FC_instance_handle;
 
 class FC_Display
 {
@@ -20,7 +21,9 @@ public:
 
 private:
     FC_Client* _client = nullptr;
+
     FC_Profile* _profile = nullptr;
+
     FC_Message_ListModel* _list_model = nullptr;
     QGuiApplication* _app_ui = nullptr;
     QQmlApplicationEngine* _engine = nullptr;

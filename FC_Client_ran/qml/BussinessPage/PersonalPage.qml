@@ -58,7 +58,7 @@ Page {
                                 font.family: "微软雅黑"
                             }
                             Label {
-                                text: profile.account
+                                text: "ID: "
                                 font.family: "微软雅黑"
                                 color: "#888"
                                 Connections{

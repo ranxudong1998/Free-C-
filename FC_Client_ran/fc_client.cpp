@@ -5,6 +5,7 @@
 #include "fc_profile.h"
 #include "fc_message_handle.h"
 #include "fc_header.h"
+#include "fc_instance_handle.h"
 #include <QDebug>
 //#include<caca_conio.h>
 
@@ -19,6 +20,7 @@ FC_Client::FC_Client()
     this->_connections = new FC_Connection(this);
 
     this->_profile = new FC_Profile(this);
+    //this->_instance_handle = new FC_instance_handle();
     this->_message_handle = new FC_Message_Handle(this);
     this->_display = new FC_Display(this,_profile);
     this->_display->show(); //show ui
@@ -78,7 +80,7 @@ char *FC_Client::getSAccount()
 void FC_Client::forward_message(FC_Message *msg)
 {
     this->_connections->write(msg);
-    delete msg;
+    delete[] msg;
 
 }
 

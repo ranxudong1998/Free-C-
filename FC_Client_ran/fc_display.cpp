@@ -2,6 +2,7 @@
 #include "fc_client.h"
 #include "fc_message_listmodel.h"
 #include "fc_profile.h"
+#include "fc_instance_handle.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml/QtQml>
@@ -32,23 +33,21 @@ void FC_Display::show(){
     this->_app_ui = new QGuiApplication(argc,nullptr);
     this->_engine = new QQmlApplicationEngine;
     
-    this->_engine->rootContext()->setContextProperty("message_listModel",this->_list_model);
-    
+    this->_engine->rootContext()->setContextProperty("message_listModel",this->_list_model);  
     this->_engine->rootContext()->setContextProperty("profile",this->_profile);
+
     this->_engine->load(QUrl(QStringLiteral("qrc:/qml/Fc_log_up.qml")));
-//    this->_engine->load(QUrl(QStringLiteral("qrc:/Fc_main.qml")));
+
+
     this->_app_ui->exec();
 }
 void FC_Display::recv(QString s){
     this->_list_model->recv({".",".",".",s});
 }
 void FC_Display::recv(std::vector<std::string> vs){//display receive message
-    std::cout <<"count打印测试"<<vs.at(1);
+    std::cout <<"count打印测试"<<vs.at(2);
     this->_list_model->recv({QString::fromStdString(vs.at(0)),
+                             QString::fromStdString(vs.at(1)),
                              QString::fromStdString("."),
-                             QString::fromStdString("."),
-                             QString::fromStdString(vs.at(1))});
+                             QString::fromStdString(vs.at(2))});
 }
-//==============================================
-//  private function
-//==============================================

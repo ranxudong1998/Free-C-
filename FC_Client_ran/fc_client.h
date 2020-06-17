@@ -15,6 +15,7 @@ class FC_Thread_Pool;
 class FC_Profile;
 class FC_Message;
 class FC_Message_Handle;
+class FC_instance_handle;
 
 class FC_Client
 {
@@ -39,6 +40,7 @@ private:
     FC_Display* _display = nullptr;//user interface
     FC_Thread_Pool* _thread_pool = nullptr;
     FC_Profile* _profile = nullptr; //account information
+    FC_instance_handle* _instance_handle = nullptr;   //
     FC_Message_Handle* _message_handle; //handle message
     char account[8]={"0000000"};
     char s_account[8]={"0000000"};

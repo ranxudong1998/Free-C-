@@ -49,16 +49,7 @@ FC_Message* FC_Message_Handle::generate_message(unsigned type,const char* conten
     message->set_body(content,msg_size);
     return message;
 }
-//const char * FC_Message_Handle::generate_message_body(unsigned type,const char* content){
-//    const char *ret = nullptr;
-//    if(type&FC_PROFILE){
-//        if(type&FC_SIGN_IN)
-//            ret = sign_up_body(content);
-//    }else{
 
-//    }
-//    return ret;
-//}
 
 
 //generate different message body
@@ -77,12 +68,20 @@ const char* FC_Message_Handle::text_body(const char* content){
 //  private function
 //==============================================
 void FC_Message_Handle::handle_text_msg(FC_Message* msg){
-    char s_account[FC_ACC_LEN];
-    memcpy(s_account,msg->header()+sizeof (unsigned)*4,FC_ACC_LEN);
+    char* w_account = new char[9];
+    memset(w_account,'\0',9);
+    char* m_account =new char[9];
+    memset(m_account,'\0',9);
+    memcpy(w_account,msg->header()+sizeof (unsigned)*2,FC_ACC_LEN);
+    memcpy(m_account,msg->header()+sizeof (unsigned)*4,FC_ACC_LEN);
     char *content = msg->body();
 //    this->_client->add_msg_to_display(content);
-    std::vector<std::string> vs;
-    vs.push_back(s_account);
-    vs.push_back(content);
+    std::vector<std::string> vs(3);
+    qDebug()<<"w_account: "<< w_account;
+    vs.at(0)=w_account;   //消息发送者id
+    vs.at(1)=m_account;   //消息接收者id
+    vs.at(2)=content;     //消息内容
     this->_client->add_msg_to_display(vs);
+    free(w_account);
+    free(m_account);
 }

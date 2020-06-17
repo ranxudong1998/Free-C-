@@ -13,6 +13,7 @@ SOURCES += \
         fc_client.cpp \
         fc_connection.cpp \
         fc_display.cpp \
+        fc_instance_handle.cpp \
         fc_message.cpp \
         fc_message_handle.cpp \
         fc_message_instance.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     fc_connection.h \
     fc_display.h \
     fc_header.h \
+    fc_instance_handle.h \
     fc_message.h \
     fc_message_handle.h \
     fc_message_instance.h \

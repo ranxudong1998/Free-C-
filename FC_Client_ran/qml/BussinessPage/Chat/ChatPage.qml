@@ -9,8 +9,13 @@ import "../../Component"
 Page {
     id: chatPage
 
-    property string s_username  //聊天对象名
-    property int s_userid       //聊天对象ID
+    property var s_username  //聊天对象名
+    property var s_userid    //聊天对象ID
+
+    //消息显示透明度设置
+    property int opacityLeft : 1
+    property int opacityRigtht : 0
+
 
     focus: true
     Keys.onBackPressed: {
@@ -57,7 +62,7 @@ Page {
             anchors.leftMargin: (topBar.height - 2) * 1.5
             anchors.fill: parent
             Label {
-                text: s_username
+                text: s_username + s_userid
                 // Layout.alignment: Qt.AlignRight
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
@@ -69,7 +74,6 @@ Page {
     bottomBar: BottomBar {
         RowLayout {
             anchors.fill: parent
-
             spacing: 5
 
             IconButton {
@@ -111,10 +115,8 @@ Page {
                 onClicked:  {
                     if(textInput.text != "" ) {
                         //传入用户ID,消息接收端ID,时间,消息内容
-                        message_listModel.add([profile.account,s_userid,"1",textInput.text])
-                       // chatModel.append({"chatContext":textInput.text});
-                       // message_listModel.append({"chatContext":content})
-                        //chatContentText.text:
+                        message_listModel.add([s_userid,profile.account,"1",textInput.text])
+                        message_listModel.currentIndex = message_listModel.count - 1
                         textInput.text = "";
                     }
                 }
@@ -126,12 +128,7 @@ Page {
     ListView {
         id: chatListView
         anchors.fill: parent
-//        model: ListModel {
-//            id: chatModel
-//            //                ListElement {
-//            //                    chatContext: ""
-//            //                }
-//        }
+
         model:message_listModel
 
         spacing: 20
@@ -145,7 +142,19 @@ Page {
         delegate: chatAreaComponent
     }
 
-
+    Connections{
+        target: message_listModel
+        onRecv_mess:{
+//            if(message_listModel.msgOpacity==1){
+//               opacityLeft=1 ;
+//                opacityRigtht=0;
+//            }else{
+//               opacityRigtht=1;
+//               opacityLeft=0;
+//            }
+            chatListView.currentIndex = chatListView.count - 1
+        }
+    }
     Component {
         id: chatAreaComponent
         Row {
@@ -158,33 +167,35 @@ Page {
                 height: chatListView.headPortraitPictureWidth
                 sourceSize: Qt.size(width, height)
                 source: constant.testPic
-                opacity: 0
+                opacity: opacityLeft
             }
 
             Item {
-                id: chatContentArea
+                id: chatContentAreaLeft
+                opacity: opacityLeft
                 width: chatListView.chatContentAreaWidth
-                height: chatContentText.contentHeight > 60 ? chatContentText.contentHeight : 60
+                height: chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
 
                 Rectangle {
+                    id:chatRectangleLeft
                     border.width: 1
                     border.color: "#ccc"
-                    anchors.right: parent.right
+                    anchors.left: parent.left
                     height: parent.height
                     color: "green"
-                    width: chatContentText.contentWidth > 200 ? chatContentText.contentWidth : 200
+                    width: chatContentTextLeft.contentWidth > 200 ? chatContentTextLeft.contentWidth : 200
                     Text {
-                        id: chatContentText
+                        id: chatContentTextLeft
                         width: 300
-                        anchors.right: parent.right
-                        anchors.rightMargin: chatListView.itemSpacing
+                        anchors.left: parent.left
+                        anchors.leftMargin: chatListView.itemSpacing
                         anchors.top: parent.top
                         anchors.topMargin: chatListView.itemSpacing
                         // anchors.centerIn: parent
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignRight
-                        text: content
+                        horizontalAlignment: Text.AlignLeft
+                        text:content
                         font.pointSize: constant.normalFontPointSize
                         font.family: "微软雅黑"
                     }
@@ -198,8 +209,41 @@ Page {
                 height: chatListView.headPortraitPictureWidth
                 sourceSize: Qt.size(width, height)
                 source: constant.testPic
+                opacity: opacityRigtht
             }
-        }
+            Item {
+                id: chatContentAreaRight
+                opacity: opacityRigtht
+                width: chatListView.chatContentAreaWidth
+                height: chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
+
+                Rectangle {
+                    id:chatRectangleRight
+                    border.width: 1
+                    border.color: "#ccc"
+                    anchors.right: parent.right
+                    height: parent.height
+                    color: "green"
+                    width: chatContentTextRight.contentWidth > 200 ? chatContentTextRight.contentWidth : 200
+                    Text {
+                        id: chatContentTextRight
+                        width: 300
+                        anchors.right: parent.right
+                        anchors.rightMargin: chatListView.itemSpacing
+                        anchors.top: parent.top
+                        anchors.topMargin: chatListView.itemSpacing
+                        // anchors.centerIn: parent
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
+                        text:content
+                        font.pointSize: constant.normalFontPointSize
+                        font.family: "微软雅黑"
+                    }
+                }
+            }
+      }
     }
+
 }
 
