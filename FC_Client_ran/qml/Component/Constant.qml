@@ -46,6 +46,9 @@ QtObject {
     readonly property url myPostsLabelIcon: icons.labelIcon("my-posts")                     // 相册
     readonly property url settingsLabelIcon: icons.labelIcon("settings")                    // 设置
     readonly property url walletLabelIcon: icons.labelIcon("wallet")                        // 钱包
+    readonly property url groupchatIcon: icons.labelIcon("groupchat")                       // 群聊
+    readonly property url newfriendsIcon: icons.labelIcon("new-fri")                        // 新的朋友
+    readonly property url friendlistright: icons.labelIcon("right")                         // 分组箭头
 
     readonly property url shareExcelIcon: icons.share("share-excel")
     readonly property url shareFileIcon: icons.share("share-file")
@@ -59,6 +62,7 @@ QtObject {
     readonly property url shareVideoIcon: icons.share("share-video")
     readonly property url shareWordIcon: icons.share("share-word")
     readonly property url shareZipIcon: icons.share("share-zip")
+
 
     property var _icons: QtObject {
         id: __icons
@@ -83,39 +87,5 @@ QtObject {
         }
     }
 
-    //    property var _length: QtObject {
-    //        id: __length
-    //        readonly property int screenWidth: Screen.width
-    //        readonly property int screenHeight: Screen.height
-    //        readonly property real devicePixelRatio: Screen.devicePixelRatio
-    //        readonly property real pixelDensity: Screen.pixelDensity
-
-    //        function controlLength(l) {
-
-    //        }
-
-    //        /*!
-    //           \internal
-    //           This holds the pixel density used for converting millimeters into pixels. This is the exact
-    //           value from \l Screen:pixelDensity, but that property only works from within a \l Window type,
-    //           so this is hardcoded here and we update it from within \l ApplicationWindow
-    //         */
-    //        //         property real pixelDensity: 4.46
-    //        property real multiplier: 1.4 //default multiplier, but can be changed by user
-
-    //        /*!
-    //           This is the standard function to use for accessing device-independent pixels. You should use
-    //           this anywhere you need to refer to distances on the screen.
-    //         */
-    //        function dp(number) {
-    //            return Math.round(number*((pixelDensity*25.4)/160)*multiplier);
-    //        }
-
-    //        function gu(number) {
-    //            return number * gridUnit
-    //        }
-
-    //        property int gridUnit: dp(64)
-    //    }
 
 }

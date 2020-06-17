@@ -11,7 +11,7 @@ PageStackWindow {
     height: 720
 
 
-    initialPage: Fc_MainView {
+    initialPage: FC_Login {
         id: mainView
         focus: mainWindow.focus
 

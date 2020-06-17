@@ -1,30 +1,80 @@
 #include "fc_profile.h"
-#include "fc_client.h"
-#include <cassert>
 
-//==============================================
-//  public function
-//==============================================
+ProfileMsg* ProfileMsg::instance = nullptr;
 
-
-FC_Profile::FC_Profile(FC_Client* client, QObject *parent ):QObject(parent),_client(client){
-}
-FC_Profile::~FC_Profile(){
+ProfileMsg *ProfileMsg::getInstance()
+{
+    if(instance == nullptr)
+        instance = new ProfileMsg ();
+    return instance;
 }
 
-QString FC_Profile::account()const{
-    return this->_account;
+void ProfileMsg::setAccount(const QString &acc)
+{
+    m_account = acc;
+    emit accountChanged(); //必须要有信号，QML端才能即时的检测信号是否被更改
 }
-void FC_Profile::set_account(const QString& account){
-    if(_account != account){
 
-    assert(_account.isEmpty());
-    this->_account = account;
-    this->_client->set_account(account.toStdString());
-    emit accountChanged();
+void ProfileMsg::setNickname(const QString &nick)
+{
+    m_nickname = nick;
+    emit nicknameChanged();
+}
+
+void ProfileMsg::setGender(const QString &gender)
+{
+    if( m_gender != gender)
+    {
+        m_gender = gender;
+        emit genderChanged();
     }
 }
 
-//==============================================
-//  private function
-//==============================================
+void ProfileMsg::setHeading(const QString &heading)
+{
+    if( m_heading != heading)
+    {
+        m_heading = heading;
+        emit headingChanged();
+    }
+}
+
+void ProfileMsg::setSign(const QString &sign)
+{
+    if(m_sign != sign)
+    {
+        m_sign = sign;
+        emit signChanged();
+    }
+}
+
+QString ProfileMsg::account() const
+{
+    return m_account;
+}
+
+QString ProfileMsg::nickname() const
+{
+    return m_nickname;
+}
+
+QString ProfileMsg::gender() const
+{
+    return m_gender;
+}
+
+QString ProfileMsg::heading() const
+{
+    return  m_heading;
+}
+
+QString ProfileMsg::sign() const
+{
+    return m_sign;
+}
+
+ProfileMsg::ProfileMsg(QObject *parent)
+    :QObject(parent)
+{
+
+}

@@ -36,11 +36,6 @@ private:
     //write about
     void on_wirte(FC_Message* message,const boost::system::error_code&err); //write callback
 
-    //read from stdin
-    void read_stdin(); //read from stdin, only support 20 byte;
-    void on_read_stdin(const boost::system::error_code& err); //read stdin callback
-    size_t read_stdin_complete(const boost::system::error_code& err); //judge read stdin complete
-
     //test function
     void on_wirte(const boost::system::error_code&err);
     void on_read(const boost::system::error_code&err);
@@ -54,11 +49,7 @@ private:
     io_service* _service = nullptr;
     FC_Message* _recv_message = nullptr;
     FC_Message_Handle* _message_handle = nullptr;
-    stream_descriptor* _stdin = nullptr;
-    stream_descriptor* _stdout = nullptr;
 
-    char _receive[20]; //store read from stdin
-    char _test[20]; //be used by test function
 };
 
 #endif // FC_CONNECTION_H

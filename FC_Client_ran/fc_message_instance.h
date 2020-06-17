@@ -21,8 +21,8 @@ public:
 
     void add_msg_to_socket(QVector<QString> content);
     void clearMsg();
-    
-    
+
+
 private:
     QHash<int, QByteArray> _roles;//store rolename
     QVector<QVector<QString>> _data; //store message

@@ -48,7 +48,8 @@ Page {
 
                 //! [0] fix the bug
                 // 在本页面压入一个页面之后再弹出
-                // x 的值会变成 180
+                // x 的值会变成 18
+
                 // 需要将其设置回 0
                 onXChanged: {
                     if(x != 0 ) {
@@ -270,7 +271,7 @@ Page {
                     buttonSize: constant.bigFontPointSize
                     onClicked: {
                         // stackView.pop();
-                        message_listModel.set_currentChatId(s_userid+profile.account);
+                        message_listModel.set_currentChatId(s_userid+profilemsg.account);
                         //message_listModel.loadMsg(s_userid+profile.account);
                         __PushPage(Qt.resolvedUrl("./Chat/ChatPage.qml"),
                                    {s_username: s_username,s_userid:s_userid});

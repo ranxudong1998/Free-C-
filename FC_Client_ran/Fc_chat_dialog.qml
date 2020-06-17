@@ -35,7 +35,7 @@ ApplicationWindow {
 //             message_listView.positionViewAtEnd()
 //            message_listView.atYEnd
 //            message_listView.forceLayout()
-        message_listView.currentIndex = message_listView.count - 1
+message_listView.currentIndex = message_listView.count - 1
         }
     }
 

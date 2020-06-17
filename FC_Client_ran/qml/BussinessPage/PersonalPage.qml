@@ -48,30 +48,31 @@ Page {
                             height: 110
                             width: 110
                             sourceSize: Qt.size(width, height)
-                            source: constant.testPic
+                            source: profilemsg.heading
                         }
 
                         ColumnLayout {
                             Layout.fillHeight: true
                             Label {
-                                text: "Xu"
+                                text: profilemsg.nickname
                                 font.family: "微软雅黑"
+                                font.pointSize: constant.normalFontPointSize
                             }
                             Label {
-                                text: "ID: "
+                                text: profilemsg.account
+                                font.pointSize: constant.normalFontPointSize
                                 font.family: "微软雅黑"
                                 color: "#888"
-                                Connections{
-                                    target: profile
-                                    onAccontChanged:{
-                                        console.log("account changed!")
-                                    }
-                               }
                             }
                         }
 
                         Item { Layout.fillWidth: true }
-
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                __PushPage(Qt.resolvedUrl("./Personal/Settings/Setting.qml"), {} ); //压入一个新的界面
+                            }
+                        }
                     }
                 }
 
@@ -131,7 +132,7 @@ Page {
                     labelText:  qsTr("Settings")
                     fontPointSize: constant.middleFontPointSize + 1.0
                     onClicked: {
-                        __PushPage(Qt.resolvedUrl("./Personal/SettingsPage.qml"), {} );
+                        __PushPage(Qt.resolvedUrl("./Personal/SettingsPage.qml"), {} ); //压入一个新的界面
                     }
                 }
             }

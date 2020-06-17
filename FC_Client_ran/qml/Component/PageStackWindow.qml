@@ -27,6 +27,7 @@ ApplicationWindow {
     readonly property alias depth: __stackView.depth
     readonly property alias busy: __stackView.busy
 
+    //栈试图
     StackView {
         id: __stackView
         anchors.fill: parent

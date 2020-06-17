@@ -42,7 +42,7 @@ public:
 
     Q_INVOKABLE void set_currentChatId(QString id);
 
-    
+
 signals:
     void recv_mess();
 private:

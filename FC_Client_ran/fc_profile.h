@@ -2,25 +2,58 @@
 #define FC_PROFILE_H
 
 #include <QObject>
+#include <QString>
 
-class FC_Client;
+/**************************************************************
 
-class FC_Profile: public QObject
+  @brief....:界面显示的Profile实体
+  @author...: zhouyi
+  @date.....:2020-06-09
+
+  ************************************************************/
+
+class ProfileMsg :public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString account READ account NOTIFY accountChanged)
+    Q_PROPERTY(QString nickname READ nickname WRITE setNickname NOTIFY nicknameChanged)
+    Q_PROPERTY(QString gender READ gender WRITE setGender NOTIFY genderChanged)
+    Q_PROPERTY(QString heading READ heading WRITE setHeading NOTIFY headingChanged)
+    Q_PROPERTY(QString sign READ sign WRITE setSign NOTIFY signChanged)
 public:
-    FC_Profile(FC_Client* client, QObject *parent = nullptr);
-    ~FC_Profile();
+    static ProfileMsg* getInstance(); //单例的设计模式
 
-    Q_PROPERTY(QString account READ account WRITE set_account )
-    QString account()const;
-    Q_INVOKABLE void set_account(const QString& account);
+
+    //setter
+    void setAccount(const QString& acc);
+    void setNickname(const QString& nick);
+    void setGender(const QString& gender);
+    void setHeading(const QString& haeding);
+    void setSign(const QString& sign);
+
+    //getter
+    QString account() const;
+    QString nickname() const;
+    QString gender() const;
+    QString heading() const;
+    QString sign() const;
+
 signals:
-    QString accountChanged();
+    void accountChanged();
+    void nicknameChanged();
+    void genderChanged();
+    void headingChanged();
+    void signChanged();
+
 private:
-    QString _account;    //用户账号
-    //QString _Saccount;   //接收端账号(个人账号,群号)
-    FC_Client* _client;
+    static ProfileMsg* instance;
+    ProfileMsg(QObject* parent = nullptr);
+
+    QString m_account;
+    QString m_nickname;
+    QString m_heading; //存放的是图片的路径
+    QString m_sign;
+    QString m_gender;
 };
 
 #endif // FC_PROFILE_H

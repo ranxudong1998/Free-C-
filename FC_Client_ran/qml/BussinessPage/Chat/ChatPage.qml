@@ -115,7 +115,7 @@ Page {
                 onClicked:  {
                     if(textInput.text != "" ) {
                         //传入用户ID,消息接收端ID,时间,消息内容
-                        message_listModel.add([s_userid,profile.account,"1",textInput.text])
+                        message_listModel.add([s_userid,profilemsg.account,"1",textInput.text])
                         message_listModel.currentIndex = message_listModel.count - 1
                         textInput.text = "";
                     }

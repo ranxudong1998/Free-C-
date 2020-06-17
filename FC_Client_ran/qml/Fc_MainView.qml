@@ -16,7 +16,6 @@ Page {
         id: topBar
         RowLayout {
             anchors.fill: parent
-            // spacing: 20
             Label {
                 Layout.leftMargin: 20
                 text: title
@@ -53,7 +52,7 @@ Page {
                 activeIconSource: constant.plusActiveIcon
                 inactiveIconSource: constant.plusInactiveIcon
                 onClicked: {
-
+                    __PushPage(Qt.resolvedUrl("./BussinessPage/Contact/AddUI.qml"), {} ); //压入一个新的界面
                 }
             }
         }
