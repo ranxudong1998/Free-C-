@@ -29,6 +29,7 @@ tcp::socket* FC_Connection::get_socket(){
 }
 
 void FC_Connection::read(){
+    qDebug()<<"read";
     read_header();
 }
 void FC_Connection::write(FC_Message* message){
@@ -63,8 +64,8 @@ void FC_Connection::on_read_header(const boost::system::error_code& err){
             exit(err.value());
         }
     }else{
-        //handle header and continue read body;
-        this->_message_handle->handle_header(this->_recv_mess);
+        qDebug()<<"on_read_header";
+        this->_message_handle->handle_header(this->_recv_mess); //set size
         this->read_body();
     }
 }
@@ -80,6 +81,7 @@ void FC_Connection::on_read_body(const boost::system::error_code& err){
             exit(err.value());
         }
     }else{
+        qDebug()<<"on_read_body";
         //handle body and read another message header;
         this->_message_handle->handle_body(this->_recv_mess);
         this->_recv_mess = new FC_Message;

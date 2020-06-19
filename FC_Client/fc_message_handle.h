@@ -1,28 +1,37 @@
 #ifndef FC_MESSAGE_HANDLE_H
 #define FC_MESSAGE_HANDLE_H
 
-#include <cstdlib>
+#include "fc_message.h"
+#include "fc_client.h"
+#include <QObject>
+#include <QString>
 
-class FC_Message;
-class FC_Client;
+class FC_Friends_Handle;
+class FC_Profile;
 
 class FC_Message_Handle
 {
 public:
+    FC_Message_Handle();
     FC_Message_Handle(FC_Client* client);
-    void handle_header(FC_Message*); //handle message header
-    void handle_body(FC_Message*); //handle message body
-
-    static FC_Message* generate_message(unsigned type,const char* content);//generate a message
-//    const char * generate_message_body(unsigned type,const char* contentr);
-    const char* sign_up_body(const char* content);
-    const char* text_body(const char* account,const char* content);
-private:
+    ~FC_Message_Handle();
+    //handle recv message
+    void handle_header(FC_Message*);
+    void handle_body(FC_Message*);
     void handle_text_msg(FC_Message* msg);
 
+    const char* text_body(const char* content);
+    static FC_Message* generate_message(unsigned type,const char* content);//generate a message
 
+
+signals:
+    void addFriendSignal(const QString& value);
 private:
     FC_Client* _client;
+    FC_Friends_Handle* _friends_handle;
+    FC_Profile* _profile;
+
+
 };
 
 #endif // FC_MESSAGE_HANDLE_H

@@ -12,8 +12,9 @@ ApplicationWindow{
         id: textinput
         x: 134
         y: 189
-        width: 80
-        height: 20
+        width: 142
+        height: 26
+       // inputMethodHints: "enter your account"
         text: qsTr("")
         font.pixelSize: 12
         focus: true
@@ -22,7 +23,7 @@ ApplicationWindow{
     Label {
         id: label
         x: 134
-        y: 150
+        y: 156
         width: 135
         height: 21
         text: qsTr("enter your count:")
@@ -34,9 +35,9 @@ ApplicationWindow{
         text: qsTr("log_up")
         onClicked: {
             if(textinput.text.length!=0){
-                console.log(textinput.text+"log up");
+                console.log(textinput.text+"log ups");
                 profile.set_account(textinput.text)
-//                console.log(profile.account);
+                console.log(profile.account);
                 chat_dialog.visible = true;
                 window.visible = false;
             }

@@ -6,7 +6,11 @@
 #include <cstring>
 using namespace std;
 
-int main()
+#include <QApplication>
+#include <QQmlApplicationEngine>
+#include <QFont>
+
+int main(int argc, char *argv[])
 {
     FC_Client client;
     return 0;

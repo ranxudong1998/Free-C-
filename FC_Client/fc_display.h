@@ -6,22 +6,35 @@
 class QGuiApplication;
 class QQmlApplicationEngine;
 class FC_Client;
-class FC_Message_ListModel;
+class FC_Message_Handle;
 class FC_Profile;
+class ProfileMsg;
+class BuddyModel;
+class Buddy;
+class  FC_Message_ListModel;
+class FC_Friends_Handle;
 
 class FC_Display
 {
 public:
     FC_Display(FC_Client* client,FC_Profile* profile);
     ~FC_Display();
-    void show(); //show ui
+    void show();
+   // void FC_Display::recv(std::vector<std::string> vs);
+    //show ui
     void recv(QString s); //display receive message
     void recv(std::vector<std::string> vs); //display receive message
 
 private:
     FC_Client* _client = nullptr;
     FC_Profile* _profile = nullptr;
+    ProfileMsg* _profilemsg=nullptr;
+    BuddyModel* _model = nullptr;
     FC_Message_ListModel* _list_model = nullptr;
+    FC_Message_Handle* _handle = nullptr;
+    FC_Friends_Handle* _fhandle =nullptr;
+    Buddy* _buddy = nullptr;
+
     QGuiApplication* _app_ui = nullptr;
     QQmlApplicationEngine* _engine = nullptr;
 };

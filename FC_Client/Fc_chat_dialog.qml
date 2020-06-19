@@ -61,9 +61,6 @@ message_listView.currentIndex = message_listView.count - 1
     }
 
 
-//    FC_Message_ListModel{
-//        id:message_listModel
-//    }
     Component{
         id:message_listDelegate
         Rectangle {
