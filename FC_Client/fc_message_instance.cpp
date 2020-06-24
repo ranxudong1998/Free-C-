@@ -48,8 +48,8 @@
     {
 
         std::vector<std::string> msg;
-        msg.push_back(content.at(1).toStdString());
         msg.push_back(content.at(0).toStdString());
+        msg.push_back(content.at(1).toStdString());
         msg.push_back(content.at(2).toStdString());
         msg.push_back(content.at(3).toStdString());
         this->_client->add_msg_to_socket(msg);

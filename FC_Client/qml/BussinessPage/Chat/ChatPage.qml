@@ -12,11 +12,6 @@ Page {
     property var s_username  //聊天对象名
     property var s_userid    //聊天对象ID
 
-    //消息显示透明度设置
-    property int opacityLeft : 1
-    property int opacityRigtht : 0
-
-
     focus: true
     Keys.onBackPressed: {
         event.accepted = true;
@@ -115,7 +110,7 @@ Page {
                 onClicked:  {
                     if(textInput.text != "" ) {
                         //传入用户ID,消息接收端ID,时间,消息内容
-                        message_listModel.add([s_userid,profilemsg.account,"1",textInput.text])
+                        message_listModel.add([profilemsg.account,s_userid,"1",textInput.text])
                         message_listModel.currentIndex = message_listModel.count - 1
                         textInput.text = "";
                     }
@@ -145,14 +140,8 @@ Page {
     Connections{
         target: message_listModel
         onRecv_mess:{
-//            if(message_listModel.msgOpacity==1){
-//               opacityLeft=1 ;
-//                opacityRigtht=0;
-//            }else{
-//               opacityRigtht=1;
-//               opacityLeft=0;
-//            }
-            chatListView.currentIndex = chatListView.count - 1
+            chatListView.currentIndex = chatListView.count - 1;
+
         }
     }
     Component {
@@ -167,17 +156,20 @@ Page {
                 height: chatListView.headPortraitPictureWidth
                 sourceSize: Qt.size(width, height)
                 source: constant.testPic
-                opacity: opacityLeft
+                //opacity:  message_listModel.msgOpacity ? 1 : 0
+                visible: message_listModel.msgOpacity ? true : false
             }
 
             Item {
                 id: chatContentAreaLeft
-                opacity: opacityLeft
+                //opacity: message_listModel.msgOpacity? 1 : 0
+                visible: message_listModel.msgOpacity ? true : false
                 width: chatListView.chatContentAreaWidth
                 height: chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
 
                 Rectangle {
                     id:chatRectangleLeft
+
                     border.width: 1
                     border.color: "#ccc"
                     anchors.left: parent.left
@@ -186,6 +178,7 @@ Page {
                     width: chatContentTextLeft.contentWidth > 200 ? chatContentTextLeft.contentWidth : 200
                     Text {
                         id: chatContentTextLeft
+
                         width: 300
                         anchors.left: parent.left
                         anchors.leftMargin: chatListView.itemSpacing
@@ -204,21 +197,25 @@ Page {
 
             Image {
                 // 头像
-                id: headPortraitPic2
+                id: empty
                 width: chatListView.headPortraitPictureWidth
                 height: chatListView.headPortraitPictureWidth
                 sourceSize: Qt.size(width, height)
-                source: constant.testPic
-                opacity: opacityRigtht
+                //source: constant.testPic
+                //opacity: message_listModel.msgOpacity ? 0 : 1
+                opacity: message_listModel.msgOpacity ? 1 : 0
+
             }
             Item {
                 id: chatContentAreaRight
-                opacity: opacityRigtht
+                visible: message_listModel.msgOpacity ? false : true
+                //opacity:  message_listModel.msgOpacity ? 0 : 1
                 width: chatListView.chatContentAreaWidth
                 height: chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
 
                 Rectangle {
                     id:chatRectangleRight
+
                     border.width: 1
                     border.color: "#ccc"
                     anchors.right: parent.right
@@ -227,6 +224,7 @@ Page {
                     width: chatContentTextRight.contentWidth > 200 ? chatContentTextRight.contentWidth : 200
                     Text {
                         id: chatContentTextRight
+
                         width: 300
                         anchors.right: parent.right
                         anchors.rightMargin: chatListView.itemSpacing
@@ -241,9 +239,24 @@ Page {
                         font.family: "微软雅黑"
                     }
                 }
+
             }
-      }
+
+        Image {
+            // 头像
+            id: headPortraitPic2
+            width: chatListView.headPortraitPictureWidth
+            height: chatListView.headPortraitPictureWidth
+            sourceSize: Qt.size(width, height)
+            source: constant.testPic
+            //opacity: message_listModel.msgOpacity ? 0 : 1
+            visible: message_listModel.msgOpacity ? false : true
+        }
+        }
     }
 
+
 }
+
+
 

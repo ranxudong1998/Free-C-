@@ -271,7 +271,7 @@ Page {
                     buttonSize: constant.bigFontPointSize
                     onClicked: {
                         // stackView.pop();
-                        message_listModel.set_currentChatId(s_userid+profilemsg.account);
+                        message_listModel.set_currentChatId(s_userid);
                         //message_listModel.loadMsg(s_userid+profile.account);
                         __PushPage(Qt.resolvedUrl("./Chat/ChatPage.qml"),
                                    {s_username: s_username,s_userid:s_userid});

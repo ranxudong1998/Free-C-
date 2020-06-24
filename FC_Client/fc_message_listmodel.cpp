@@ -35,33 +35,45 @@ FC_Message_ListModel::FC_Message_ListModel(FC_Client*client, QObject* parent)
 //     _all_mess.insert("1111111411111112",tmp11);
 //     _all_mess.insert("1111111411111113",tmp11);
 //     _all_mess.insert("1111111311111114",tmp11);
-          _all_mess.insert("@12345@13456",tmp11);
-          _all_mess.insert("@12345@24567",tmp11);
-          _all_mess.insert("@12345@23456",tmp11);
-          _all_mess.insert("@12345@12345",tmp11);
-          _all_mess.insert("@13456@12345",tmp11);
-          _all_mess.insert("@13456@13456",tmp11);
-          _all_mess.insert("@13456@24567",tmp11);
-          _all_mess.insert("@13456@23456",tmp11);
-          _all_mess.insert("@24567@12345",tmp11);
-          _all_mess.insert("@24567@13456",tmp11);
-          _all_mess.insert("@24567@24567",tmp11);
-          _all_mess.insert("@24567@24567",tmp11);
-          _all_mess.insert("@23456@23456",tmp11);
-          _all_mess.insert("@23456@24567",tmp11);
-          _all_mess.insert("@23456@13456",tmp11);
-          _all_mess.insert("@23456@12345",tmp11);
-
+//          _all_mess.insert("@12345@13456",tmp11);
+//          _all_mess.insert("@12345@24567",tmp11);
+//          _all_mess.insert("@12345@23456",tmp11);
+//          _all_mess.insert("@12345@12345",tmp11);
+//          _all_mess.insert("@13456@12345",tmp11);
+//          _all_mess.insert("@13456@13456",tmp11);
+//          _all_mess.insert("@13456@24567",tmp11);
+//          _all_mess.insert("@13456@23456",tmp11);
+//          _all_mess.insert("@24567@12345",tmp11);
+//          _all_mess.insert("@24567@13456",tmp11);
+//          _all_mess.insert("@24567@23456",tmp11);
+//          _all_mess.insert("@24567@24567",tmp11);
+//          _all_mess.insert("@23456@23456",tmp11);
+//          _all_mess.insert("@23456@24567",tmp11);
+//          _all_mess.insert("@23456@13456",tmp11);
+//          _all_mess.insert("@23456@12345",tmp11);
+          _all_mess.insert("@12345",tmp11);
+          _all_mess.insert("@24567",tmp11);
+          _all_mess.insert("@23456",tmp11);
+          _all_mess.insert("@13456",tmp11);
 
 }
 FC_Message_ListModel::~FC_Message_ListModel(){
     delete this->_instace;
 }
 
-MsgVector::iterator FC_Message_ListModel::handle_msg(QVector<QString> content)
+MsgVector::iterator FC_Message_ListModel::handle_own_msg(QVector<QString> content)
+{
+    qDebug()<<"key date:"<<content.at(0)+content.at(1);
+    MsgVector::iterator iter =this->_all_mess.find(content.at(1));  //检索key
+    iter.value().push_back(content);
+
+    return iter;
+}
+
+MsgVector::iterator FC_Message_ListModel::handle_recv_msg(QVector<QString> content)
 {
       qDebug()<<"key date:"<<content.at(0)+content.at(1);
-      MsgVector::iterator iter =this->_all_mess.find(content.at(0)+content.at(1));  //检索key
+      MsgVector::iterator iter =this->_all_mess.find(content.at(0));  //检索key
       iter.value().push_back(content);
 
       return iter;
@@ -90,38 +102,28 @@ QHash<int, QByteArray> FC_Message_ListModel::roleNames() const{
 //transfer function
 void FC_Message_ListModel::add(QVector<QString> content){// display to socket
     add_msg_to_socket(content);
-    handle_msg(content);
-    set_msgOpacity(0);
+    handle_own_msg(content);
+    set_msgOpacity(false);
 
-    MsgVector::iterator iter =this->_all_mess.find(this->currentChatId());
-
-    for(int i = 0; i < iter->length();i++){
-       beginInsertRows(QModelIndex(),rowCount(),rowCount());
-        //消息直接在UI上打印
-       this->_instace->add(iter.value().at(i));
-       endInsertRows();
-       emit recv_mess();
-    }
-    iter->clear();
+    beginInsertRows(QModelIndex(),rowCount(),rowCount());
+     //消息直接在UI上打印
+    this->_instace->add(content);
+    endInsertRows();
+    emit recv_mess();
 }
 void FC_Message_ListModel::recv(QVector<QString> content){// socket to display
 
-    handle_msg(content);
-    set_msgOpacity(1);
+    handle_recv_msg(content);
     //检测是否为当前聊天信息
-    if(content.at(0)+content.at(1)!=this->currentChatId()){
+    if(content.at(0) !=this->currentChatId()){
         return;
     }
-    MsgVector:: iterator iter =this->_all_mess.find(this->currentChatId());
-    for(int i = 0; i < iter->length();i++){
-       beginInsertRows(QModelIndex(),rowCount(),rowCount());
-        //消息直接在UI上打印
-       this->_instace->recv(iter.value().at(i));
-
-       endInsertRows();
-       emit recv_mess();
-    }
-    iter->clear();
+    set_msgOpacity(true);
+    beginInsertRows(QModelIndex(),rowCount(),rowCount());
+     //消息直接在UI上打印
+    this->_instace->recv(content);
+    endInsertRows();
+    emit recv_mess();
 }
 
 void FC_Message_ListModel::loadMsg(QString key)
@@ -132,13 +134,20 @@ void FC_Message_ListModel::loadMsg(QString key)
     qDebug()<<"load key data: "<<key;
     MsgVector:: iterator iter =this->_all_mess.find(key);
     for(int i = 0; i < iter->length();i++){
-       beginInsertRows(QModelIndex(),rowCount(),rowCount());
+     //    beginInsertRows(QModelIndex(),rowCount(),rowCount());
         //消息直接在UI上打印
-       this->_instace->recv(iter.value().at(i));
+       if(iter.value().at(i).at(0) == key){
+           set_msgOpacity(true);
+           this->_instace->recv(iter.value().at(i));
+       }else {
+            set_msgOpacity(false);
+            this->_instace->add(iter.value().at(i));
+
+       }
        endInsertRows();
        emit recv_mess();
     }
-    //iter->clear();
+
 }
 
 QString FC_Message_ListModel::currentChatId() const
@@ -146,22 +155,25 @@ QString FC_Message_ListModel::currentChatId() const
     return this->_currentChatId;
 }
 
-int FC_Message_ListModel::msgOpacity() const
-{
-    return this->_opacity;
-}
-
-int FC_Message_ListModel::set_msgOpacity(int opacity)
-{
-    this->_opacity=opacity;
-}
-
-
 void FC_Message_ListModel::set_currentChatId(QString id)
 {
     this->_currentChatId = id;
     loadMsg(id);
 
 }
+
+
+bool FC_Message_ListModel::msgOpacity() const
+{
+    return this->_msgOpacity;
+}
+
+bool FC_Message_ListModel::set_msgOpacity(bool tmp)
+{
+    return this->_msgOpacity = tmp;
+}
+
+
+
 
 

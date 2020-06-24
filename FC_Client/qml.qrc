@@ -150,5 +150,6 @@
         <file>qml/resource/icons/label-icons/groupchat.png</file>
         <file>qml/resource/icons/label-icons/right.png</file>
         <file>qml/BussinessPage/Contact/NewFriendsPage.qml</file>
+        <file>qml/resource/background/active/chat-bubble1.png</file>
     </qresource>
 </RCC>

@@ -18,7 +18,8 @@ public:
     FC_Message_ListModel(FC_Client*client, QObject* parent=nullptr);
     ~FC_Message_ListModel();
 
-     MsgVector::iterator handle_msg(QVector<QString> content);
+     MsgVector::iterator handle_recv_msg(QVector<QString> content);
+     MsgVector::iterator handle_own_msg(QVector<QString> content);
      void add_msg_to_socket(QVector<QString> content);
 
     //override function
@@ -28,11 +29,11 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
     Q_PROPERTY(QString currentChatId READ currentChatId WRITE set_currentChatId)
-    Q_PROPERTY(int msgOpacity READ msgOpacity WRITE set_msgOpacity)
+    Q_PROPERTY(bool msgOpacity READ msgOpacity WRITE set_msgOpacity)
 
     QString currentChatId() const;
-    int msgOpacity() const;
-    int set_msgOpacity(int opacity);
+    bool msgOpacity() const;
+    bool set_msgOpacity(bool tmp);
 
     Q_INVOKABLE void add(QVector<QString> mess);// display to socket
     Q_INVOKABLE void recv(QVector<QString> content);// socket to display
@@ -51,7 +52,7 @@ private:
     FC_Message_Instance* _instace = nullptr;
     MsgVector _all_mess;   //存储所有的消息 <消息发送者id,对行id的所有消息>
     QString _currentChatId;  //当前聊天对象Id
-    int _opacity=0;           //设置消息的左右显示,0表示右边显示,1表示左边显示
+    bool _msgOpacity;           //设置消息的左右显示,0表示右边显示,1表示左边显示
 
 
 };

@@ -18,6 +18,8 @@ QtObject {
     readonly property int bigFontPointSize : UI.bigFontPointSize              // 软件标题
 
     readonly property url testPic: Qt.resolvedUrl( "../resource/tests/tests001.jpeg")
+    readonly property url qipaoRight: Qt.resolvedUrl( "../resource/background/active/chat-bubble.png")
+    readonly property url qipaoLeft: Qt.resolvedUrl( "../resource/background/active/chat-bubble1.png")
 
     readonly property alias icons: __icons
     readonly property url iconsPath: "../resource/icons/"

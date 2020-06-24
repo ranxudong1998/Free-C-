@@ -1,7 +1,7 @@
 #include "fc_friends_handle.h"
 #include "fc_message.h"
 #include "fc_client.h"
-#include "fc_buddylist_ctrl.h"
+
 #include "fc_buddyitem.h"
 #include "fc_buddymodel.h"
 #include "fc_buddyteam.h"
@@ -11,7 +11,9 @@
 #include <filesystem>
 #include <QVector>
 #include <algorithm>
+#include<iostream>
 namespace fs = std::filesystem;
+
 
 FC_Friends_Handle::FC_Friends_Handle(FC_Client *client, QObject *parent)
     :QObject(parent),_client(client)
@@ -180,7 +182,7 @@ void FC_Friends_Handle::refresh_friends_list(const string &msg)
     std::string sex;
     if(!reader.parse(msg, root)){
       std::cout <<"failed" <<std::endl;
-    }
+     }
     else{
         acc = root["account"].asString();
         nick = root["nickname"].asString();
