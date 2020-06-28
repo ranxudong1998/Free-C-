@@ -42,11 +42,12 @@ public:
 
      //handle offline
      void handle_offlineM(const string& acc);
-
+     void handle_group_text_msg(FC_Message*);
 private:
     void handle_ordinary_msg(FC_Message*);
     void handle_sign_in(const char* s);
     void handle_text_msg(FC_Message*);
+
 
     string handle_user_head(const string& filepath);
 private:

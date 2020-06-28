@@ -1,7 +1,7 @@
 #include "fc_friends_handle.h"
 #include "fc_message.h"
 #include "fc_client.h"
-
+#include "fc_message_handle.h"
 #include "fc_buddyitem.h"
 #include "fc_buddymodel.h"
 #include "fc_buddyteam.h"
@@ -12,6 +12,7 @@
 #include <QVector>
 #include <algorithm>
 #include<iostream>
+#include <unordered_map>
 namespace fs = std::filesystem;
 
 
@@ -19,28 +20,51 @@ FC_Friends_Handle::FC_Friends_Handle(FC_Client *client, QObject *parent)
     :QObject(parent),_client(client)
 {
     _model = BuddyModel::getInstance();
+
+//    _items["@12345"]=nullptr;
 }
 
 FC_Friends_Handle::~FC_Friends_Handle()
 {
-
+    cout<<"析构函数"<<endl;
 }
 
 void FC_Friends_Handle::search_friends(const QString &friendsAccount)
 {
-    //read qml to c++
-    char* account = (char*)malloc(friendsAccount.size()+1);
-    memset(account,'\0',friendsAccount.size()+1);
-    //QString to char*
-    strcpy(account,friendsAccount.toLocal8Bit().data());
-    qDebug()<<"test data: in handle"<<account<<"\n";
-    FC_Message* fc_message= new FC_Message;
-    fc_message->set_message_type(FC_FRIENDS_SEARCH);
-    fc_message->set_body_length(strlen(account));
-    fc_message->set_body(account,strlen(account));
 
-    free(account);//记得释放内存，否则会报错
-    _client->add_msg_to_socket(fc_message);
+    string useacc = friendsAccount.toStdString();
+
+//    if(_client->get_item().count(useacc))
+//        cout<<"存在这个用户"<<endl;
+//    else
+//        cout<<"不存在这个用户"<<endl;
+    //read qml to c++
+//    cout<<"_items[useacc]->account().toStdString()"<<_items[useacc]->account().toStdString()<<endl;
+    if(_client->get_item().count(useacc) ==0) //表明本地没有这个好友
+    {
+        char* account = (char*)malloc(friendsAccount.size()+1);
+        memset(account,'\0',friendsAccount.size()+1);
+        //QString to char*
+        strcpy(account,friendsAccount.toLocal8Bit().data());
+        qDebug()<<"test data: in handle"<<account<<"\n";
+        FC_Message* fc_message= new FC_Message;
+        fc_message->set_message_type(FC_FRIENDS_SEARCH);
+        fc_message->set_body_length(strlen(account));
+        fc_message->set_body(account,strlen(account));
+
+        free(account);//记得释放内存，否则会报错
+        _client->add_msg_to_socket(fc_message);
+    }else
+    {
+        cout<<"有这个好友"<<endl;
+        Buddy *buddy = Buddy::getInstance();
+        buddy->clear();
+        buddy->setAccount(_client->get_item()[useacc]->account());
+        buddy->setHeading(_client->get_item()[useacc]->heading());
+        buddy->setNickname(_client->get_item()[useacc]->nickname());
+        buddy->setVisShow(true);
+    }
+
 }
 
 void FC_Friends_Handle::add_friends(const QString &msg)
@@ -79,8 +103,8 @@ void FC_Friends_Handle::update_remark(const QString &team, const QString &item, 
                     (*iter)->setMarkname(user);
                     qDebug()<<"(*iter)->markname:"<<(*iter)->markname();
                 }
-            }
-        }break;
+            }break;
+        }
     }
     string content = _client->getUniqueUserName() +'.'+item.toLocal8Bit().data()+'.'+user.toLocal8Bit().data();
     FC_Message* msg = new FC_Message;
@@ -105,10 +129,12 @@ void FC_Friends_Handle::delete_friend(const QString &team, const QString &item)
                 {
                     qDebug()<<"删除一个信息";
                     iter = _model->team(i)->get_items().erase(iter);
+
                 }else
                     iter++;
             }
-        }break;
+            break;
+        }
     }
 
     FC_Message* msg = new FC_Message;
@@ -129,10 +155,21 @@ void FC_Friends_Handle::validation_request(const QString &result)
         BuddyItem* item = new BuddyItem ();
         item->setAccount(buddy->account());
         item->setHeading(buddy->heading());
-        item->setNickname(buddy->nickname());
+        item->setNickname(buddy->nickname()); //一个单独的项
 
-        _model->team(0)->appendItem(item);
-        emit _model->teamsChanged();
+        for(int i=0;i<_model->teamCount();i++)
+        {
+            qDebug()<<_model->team(i)->teamname();
+            if(_model->team(i)->teamname() == "friends")
+            {
+                QVector<BuddyItem*>::iterator iter;
+                //找到对应分组名
+                qDebug()<<"找到好友列表"<<_model->team(i)->teamname();
+                _model->team(i)->appendItem(item);
+                _model->teamsChanged();
+                break;
+            }
+        }
 
         FC_Message* message = new FC_Message;
         message->set_message_type(FC_FRIENDS_ADD_R);
@@ -206,8 +243,21 @@ void FC_Friends_Handle::refresh_friends_list(const string &msg)
     item->setNickname(QString::fromLocal8Bit(nick.c_str()));
     item->setSign(QString::fromLocal8Bit(sign.c_str()));
     item->setGender(QString::fromLocal8Bit(sex.c_str()));
-    _model->team(0)->appendItem(item);
-    emit _model->teamsChanged();
+
+
+    for(int i=0;i<_model->teamCount();i++)
+    {
+        qDebug()<<_model->team(i)->teamname();
+        if(_model->team(i)->teamname() == "friends")
+        {
+            QVector<BuddyItem*>::iterator iter;
+            //找到对应分组名
+            qDebug()<<"找到好友列表"<<_model->team(i)->teamname();
+            _model->team(i)->appendItem(item);
+            _model->teamsChanged();
+            break;
+        }
+    }
 
 }
 
@@ -230,7 +280,7 @@ void FC_Friends_Handle::parser_friends_json(const string &content)
             Json::Value item = items[i]["members"];
             for(int j=0;j<item.size();j++)
             {
-                 BuddyItem* buddyitem = new BuddyItem();
+                BuddyItem* buddyitem = new BuddyItem();
 
                 string acc = item[j]["account"].asString();
                 string nickname = item[j]["nickname"].asString();
@@ -241,6 +291,7 @@ void FC_Friends_Handle::parser_friends_json(const string &content)
                 string gender = item[j]["gender"].asString();
                 string sign = item[j]["sign"].asString();
 
+
                 buddyitem->setMarkname(QString::fromLocal8Bit(markname.c_str()));
                 buddyitem->setAccount(QString::fromLocal8Bit(acc.c_str()));
                 buddyitem->setNickname(QString::fromLocal8Bit(nickname.c_str()));
@@ -249,7 +300,8 @@ void FC_Friends_Handle::parser_friends_json(const string &content)
                 buddyitem->setSign(QString::fromLocal8Bit(sign.c_str()));
                 team->appendItem(buddyitem);
 
-
+                _client->set_item(acc,buddyitem);
+//                _items[acc] = buddyitem; //这里容器存放的是好友信息
             }
             _model->appendTeam(team);
         }
@@ -257,36 +309,49 @@ void FC_Friends_Handle::parser_friends_json(const string &content)
     }
 }
 
+unordered_map<string, BuddyItem *> &FC_Friends_Handle::get_item()
+{
+    return _items;
+}
+
+void FC_Friends_Handle::set_item(string &acc, BuddyItem *item)
+{
+    _items[acc] = item;
+}
+
 
 void FC_Friends_Handle::search_show(const string &msg)
 {
+    Buddy *buddy = Buddy::getInstance();
+    buddy->clear();
     if(strcmp(msg.c_str(),"error\0") == 0 )
     {
         qDebug()<<"没有这个好友信息"<<"\n";
-    }
-    Json::Value root;
-    Json::Reader reader;
-    std::string acc;
-    std::string nick;
-    std::string heading;
-    if(!reader.parse(msg, root)){
-      std::cout <<"failed" <<std::endl;
     }else{
-        acc = root["account"].asString();
-        nick = root["nickname"].asString();
-        heading = root["heading"].asString();
+        Json::Value root;
+        Json::Reader reader;
+        std::string acc;
+        std::string nick;
+        std::string heading;
+        if(!reader.parse(msg, root)){
+          std::cout <<"failed" <<std::endl;
+        }else{
+            acc = root["account"].asString();
+            nick = root["nickname"].asString();
+            heading = root["heading"].asString();
+        }
+        _client->save_user_head(acc,heading); //保存图片
+
+        fs::path p = fs::current_path(); //目的是为了得到相对路径
+        string path = "file://"+p.string()+"/assert/"+acc+".jpg";
+
+        buddy->setAccount(QString::fromLocal8Bit(acc.c_str()));
+        buddy->setNickname(QString::fromLocal8Bit(nick.c_str()));
+        buddy->setHeading(QString::fromLocal8Bit(path.c_str())); //设置了相应的数据
+
+        qDebug()<<buddy->account()<<" "<<buddy->heading()<<" "<<buddy->nickname();
     }
-    _client->save_user_head(acc,heading); //保存图片
 
-    fs::path p = fs::current_path(); //目的是为了得到相对路径
-    string path = "file://"+p.string()+"/assert/"+acc+".jpg";
-
-    Buddy *buddy = Buddy::getInstance();
-    buddy->setAccount(QString::fromLocal8Bit(acc.c_str()));
-    buddy->setNickname(QString::fromLocal8Bit(nick.c_str()));
-    buddy->setHeading(QString::fromLocal8Bit(path.c_str())); //设置了相应的数据
-
-    qDebug()<<buddy->account()<<" "<<buddy->heading()<<" "<<buddy->nickname();
 }
 
 void FC_Friends_Handle::add_friends_show(const string &msg)

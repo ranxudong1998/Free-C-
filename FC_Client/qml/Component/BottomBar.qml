@@ -9,6 +9,7 @@ StatusBar {
         background: Rectangle {
             implicitHeight: 16
             implicitWidth: 200
+
             Rectangle {
                 anchors.top: parent.top
                 width: parent.width

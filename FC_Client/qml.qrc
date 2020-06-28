@@ -54,7 +54,7 @@
         <file>qml/resource/icons/bar-icons/inactive/我.png</file>
         <file>qml/resource/icons/bar-icons/inactive/plus.png</file>
         <file>qml/resource/icons/bar-icons/inactive/sound.png</file>
-        <file>qml/resource/icons/bar-icons/a6b.png</file>
+        <file>qml/resource/icons/bar-icons/add.png</file>
         <file>qml/resource/icons/bar-icons/a6c.png</file>
         <file>qml/resource/icons/bar-icons/a9p.png</file>
         <file>qml/resource/icons/bar-icons/a9q.png</file>
@@ -151,5 +151,6 @@
         <file>qml/resource/icons/label-icons/right.png</file>
         <file>qml/BussinessPage/Contact/NewFriendsPage.qml</file>
         <file>qml/resource/background/active/chat-bubble1.png</file>
+        <file>qml/BussinessPage/Contact/GroupList.qml</file>
     </qresource>
 </RCC>

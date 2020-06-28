@@ -8,7 +8,8 @@ import "../../Component"
 
 Page {
     id: chatPage
-
+    width: 360
+    height: 720
     property var s_username  //聊天对象名
     property var s_userid    //聊天对象ID
 
@@ -70,7 +71,6 @@ Page {
         RowLayout {
             anchors.fill: parent
             spacing: 5
-
             IconButton {
                 width: topBar.height - 2
                 height: topBar.height - 2
@@ -106,18 +106,42 @@ Page {
 
             SampleButton {
                 Layout.alignment: Qt.AlignRight
+                visible: textInput.text.length ? true: false
                 text: qsTr("Send")
                 onClicked:  {
                     if(textInput.text != "" ) {
                         //传入用户ID,消息接收端ID,时间,消息内容
                         message_listModel.add([profilemsg.account,s_userid,"1",textInput.text])
-                        message_listModel.currentIndex = message_listModel.count - 1
+                        //message_listModel.currentIndex = message_listModel.count - 1
+                         //传入昵称，头像，文本（可以扩展为有备注则传入备注，没有则传入昵称），也可以只传用户标识过去 然后C++端比较去获得相应信息
+//                         chat_listModel.add([profilemsg.nickname,profilemsg.heading,textInput.text])
+                        chat_listModel.add([s_userid,textInput.text]) //添加最后一条消息
                         textInput.text = "";
+
+
                     }
                 }
             }
+            IconButton {
+                Layout.alignment: Qt.AlignRight
+                visible: textInput.text.length ? false: true
+                width: topBar.height * 0.9
+                height: topBar.height * 0.9
+                activeIconSource: constant.addchatIcon
+                inactiveIconSource: constant.addchatIcon
+                onClicked: tool.visible = true
+            }
+
             Item { width: 5; height: 5 }
         }
+//        Rectangle{
+//            id:tool
+//            visible: false
+//            width: chatPage.width
+//            color: "red"
+//            height: 50
+//        }
+
     }
 
     ListView {
@@ -140,8 +164,8 @@ Page {
     Connections{
         target: message_listModel
         onRecv_mess:{
-            chatListView.currentIndex = chatListView.count - 1;
-
+            console.log("消息中添加一条")
+            //chatListView.currentIndex = chatListView.count - 1;
         }
     }
     Component {
@@ -155,15 +179,18 @@ Page {
                 width: chatListView.headPortraitPictureWidth
                 height: chatListView.headPortraitPictureWidth
                 sourceSize: Qt.size(width, height)
-                source: constant.testPic
+                source: imagePathLeft
+                //source: constant.testPic
                 //opacity:  message_listModel.msgOpacity ? 1 : 0
-                visible: message_listModel.msgOpacity ? true : false
+//                visible: message_listModel.msgOpacity ? true : false
+                visible: parseInt(msgOpacity) ? true : false;
             }
 
             Item {
                 id: chatContentAreaLeft
+                visible: parseInt(msgOpacity) ? true : false;
                 //opacity: message_listModel.msgOpacity? 1 : 0
-                visible: message_listModel.msgOpacity ? true : false
+//                visible: message_listModel.msgOpacity ? true : false
                 width: chatListView.chatContentAreaWidth
                 height: chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
 
@@ -208,7 +235,8 @@ Page {
             }
             Item {
                 id: chatContentAreaRight
-                visible: message_listModel.msgOpacity ? false : true
+                visible: parseInt(msgOpacity) ? false : true;
+//                visible: message_listModel.msgOpacity ? false : true
                 //opacity:  message_listModel.msgOpacity ? 0 : 1
                 width: chatListView.chatContentAreaWidth
                 height: chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
@@ -248,9 +276,13 @@ Page {
             width: chatListView.headPortraitPictureWidth
             height: chatListView.headPortraitPictureWidth
             sourceSize: Qt.size(width, height)
-            source: constant.testPic
+//            anchors.right:
+            source: imagePathRight
+//            anchors.right: chatPage.right
+           // source: constant.testPic
             //opacity: message_listModel.msgOpacity ? 0 : 1
-            visible: message_listModel.msgOpacity ? false : true
+            visible: parseInt(msgOpacity) ? false : true;
+//            visible: message_listModel.msgOpacity ? false : true
         }
         }
     }

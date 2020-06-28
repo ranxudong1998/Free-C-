@@ -39,16 +39,22 @@ FC_Connection::~FC_Connection(){
     delete this->_socket;
 }
 void FC_Connection::write(std::vector<std::string> msg){
-
+    int type1 = FC_TEXT_MEG;
+    int type2 = FC_GROUP_TEXT_MEG;
     string content = msg.at(0)+msg.at(1)+msg.at(3);
-    //std::cout<<account<<"+"<<s_account<<"+"<<content<<std::endl;
-    int type = FC_TEXT_MEG;
-
-
     const char* body = this->_message_handle->text_body(content.c_str());
-    FC_Message* message = this->_message_handle->
-            generate_message(type, body);
-    this->write(message);
+    if(msg.at(1) == "@56789"){
+        FC_Message* message = this->_message_handle->
+                generate_message(type2, body);
+        this->write(message);
+    }else{
+
+
+        FC_Message* message = this->_message_handle->
+                generate_message(type1, body);
+        this->write(message);
+    }
+
 }
 
 //==============================================
@@ -87,8 +93,8 @@ void FC_Connection::read_header(){
     async_read(*this->_socket,buffer(_recv_message->header(), _recv_message->header_length()),bind(&FC_Connection::on_read_header,this,_1));
 }
 void FC_Connection::read_body(){
-     std::cout<<"test read_body()";
-   async_read(*this->_socket,buffer(_recv_message->body(), _recv_message->body_length()),bind(&FC_Connection::on_read_body,this,_1));
+    std::cout<<"test read_body()";
+    async_read(*this->_socket,buffer(_recv_message->body(), _recv_message->body_length()),bind(&FC_Connection::on_read_body,this,_1));
 
 }
 void FC_Connection::on_read_header(const boost::system::error_code&err){
@@ -157,8 +163,8 @@ void FC_Connection::on_wirte(const boost::system::error_code&err){
     if(!err){
         qDebug() << "write successfully";
     }else{
-         qDebug() << "on_write: "<<err.message().data();
-         exit(err.value());
+        qDebug() << "on_write: "<<err.message().data();
+        exit(err.value());
     }
 }
 void FC_Connection::on_read(const boost::system::error_code&err){

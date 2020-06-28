@@ -1,25 +1,66 @@
-
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
-import "../Component"
+import "../../Component"
 
 Page {
     id: chatsView
-    title: "FriendList"
+    title: "GroupList"
     color: "white"
     property int headPrtraitSize: 90
- //   signal openNewChat(int s_userid, string s_username)
+    property string s_username : "Family"
+    property string s_userid  :"@56789"
 
+    topBar: TopBar {
+        id: topBar
 
+        //! aviod looping binding
+        Item { anchors.fill: parent }
+        RowLayout {
+            anchors.fill: parent
+            spacing: 10
+
+            Item { width:  topBar.height - 2; height: width }
+
+            IconButton {
+                height: topBar.height - 2
+                width: topBar.height - 2
+                anchors.verticalCenter: parent.verticalCenter
+                activeIconSource: constant.backActiveIcon
+                inactiveIconSource: constant.backInactiveIcon
+                onClicked: {
+                    try { stackView.pop(); }  catch(e) { }
+                }
+
+                Separator {
+                    color: "black"
+
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    Label{ text: "   群   聊";color: "white"}
+                }
+
+                //! [0] fix the bug
+                // 在本页面压入一个页面之后再弹出
+                // x 的值会变成 18
+
+                // 需要将其设置回 0
+                onXChanged: {
+                    if(x != 0 ) {
+                        x = 0
+                    }
+                }
+                //! [0] fix the bug
+            }
+        }
+    }
     ListView {
         id: listView
         width: chatsView.width
         height: chatsView.height
 
-        model: chat_listModel
-//        model: fmsgmodel
+        model: chatItemsModel
 
         add: Transition {
             NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
@@ -108,14 +149,12 @@ Page {
                 anchors.fill: parent
                 anchors.margins: spacing
                 Image {
-                    width: headPrtraitSize-20
-                    height: headPrtraitSize-20
+                    width: headPrtraitSize
+                    height: headPrtraitSize
                     anchors.verticalCenter: parent.verticalCenter
-                    sourceSize.width: headPrtraitSize - 20
-                    sourceSize.height: headPrtraitSize - 20
-//                    source: "../resource/tests/tests001.jpeg"
-                    source: imagePath
-
+                    sourceSize.width: headPrtraitSize - 2
+                    sourceSize.height: headPrtraitSize - 2
+                    source: "../../resource/tests/tests001.jpeg"
                     fillMode: Image.PreserveAspectFit
                     //clip: true
                 }
@@ -125,13 +164,13 @@ Page {
                     RowLayout {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Label { Layout.fillWidth: true; text: userName }
+                        Label { Layout.fillWidth: true; text: name }
 
                     }
                     RowLayout {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Label { Layout.fillWidth: true ;text: lastContent}
+                        Label { Layout.fillWidth: true; text: chatId }
 
                     }
                 }
@@ -154,7 +193,8 @@ Page {
                     chatItemMenu.popup();
                 }
                 onClicked: {
-                    //__LoadChatPage(chatContext, name);
+                     message_listModel.set_currentChatId(s_userid);
+                    __LoadChatPage(chatId, name);
                 }
             }
         }
@@ -182,30 +222,35 @@ Page {
             }
         }
 
-    }
+        ListModel {
+            id: chatItemsModel
 
-    Connections{
-        target: chat_listModel
-        onUpdate_mess:{
-//            listView.currentIndex = listView.count - 1;
-            console.log("一条记录发生改变")
+            /*
+                  联系人名字
+                  聊天记录
+                  时间
+                  是否
+                 */
+            Component.onCompleted: {
+
+                chatItemsModel
+                .append(
+                     {
+                         "name":"Family ",
+                         "chatId":"@56789",
+                     });
+            }
         }
     }
 
+
     function __LoadChatPage(s_userid, s_username){
 
-        __PushPage(Qt.resolvedUrl("./Chat/ChatPage.qml"),
+        __PushPage(Qt.resolvedUrl("../Chat/ChatPage.qml"),
                    {s_userid:s_userid,s_username: s_username } );
 
 
     }
-//    Timer{
-//        interval: 1000
-//        running: true
-//        repeat: true
-//        onTriggered: console.log("timer triggered")
-//    }
 
 }
-
 

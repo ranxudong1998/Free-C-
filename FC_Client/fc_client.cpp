@@ -51,7 +51,7 @@ void FC_Client::add_msg_to_socket(FC_Message *msg)
 
 void FC_Client::add_msg_to_qml(FC_Message *msg)
 {
-//    _message_handle->displaytoQML(msg);
+    //    _message_handle->displaytoQML(msg);
 }
 
 //display about
@@ -60,23 +60,11 @@ void FC_Client::add_msg_to_socket(std::vector<std::string> msg){
     this->_connections->write(msg);
 }
 
-//void FC_Client::json_data_parser_self(const string &content)
-//{
-//    _profile->parser_json(content);
-//}
+void FC_Client::add_group_msg_to_display(std::vector<std::string> msg)
+{
+    this->_display->recv_group_msg(msg);
+}
 
-//得到服务端的解析信息
-
-
-//void FC_Client::update_nick(const string &nick)
-//{
-//    _profile->update_nick(QString::fromStdString(nick));
-//}
-
-//void FC_Client::update_gender(const string &sex)
-//{
-//    _profile->update_gender(QString::fromStdString(sex));
-//}
 
 void FC_Client::setUniqueUserName(string name)
 {
@@ -90,7 +78,7 @@ string FC_Client::getUniqueUserName()
 
 void FC_Client::add_msg_to_display(char* msg){
     QString s = msg;
-//    this->_display->recv(s);
+    this->_display->recv(s);
 }
 void FC_Client::add_msg_to_display(std::vector<std::string> msg){ //socket message to display
     this->_display->recv(msg);
@@ -118,6 +106,16 @@ void FC_Client::save_user_head(const string &acc,const string& heading)
     }
     fout.write(heading.data(), heading.size());
     fout.close();
+}
+
+std::unordered_map<std::string, BuddyItem *> &FC_Client::get_item()
+{
+    return _items;
+}
+
+void FC_Client::set_item(std::string &acc, BuddyItem *item)
+{
+    _items[acc] = item;
 }
 
 

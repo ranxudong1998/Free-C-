@@ -9,6 +9,7 @@
 #include "fc_buddyteam.h"
 #include "fc_friends_handle.h"
 #include "fc_buddy.h"
+#include "fc_chat_listmodel.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml/QtQml>
@@ -29,6 +30,7 @@ FC_Display::FC_Display(FC_Client* client,FC_Profile* profile)
     //_profile = new FC_Profile (client);
     _buddy = Buddy::getInstance();
     this->_list_model = new FC_Message_ListModel(_client);
+    this->_chat_listModel = new FC_Chat_ListModel(_client);
 
 
 }
@@ -46,12 +48,26 @@ FC_Display::~FC_Display(){
 void FC_Display::recv(QString s){
     this->_list_model->recv({".",".",".",s});
 }
-void FC_Display::recv(std::vector<std::string> vs){//display receive message
+
+void FC_Display::recv_group_msg(std::vector<std::string> vs)
+{
     std::cout <<"count打印测试"<<vs.at(2);
-    this->_list_model->recv({QString::fromStdString(vs.at(0)),
-                             QString::fromStdString(vs.at(1)),
+    this->_list_model->recv_group({QString::fromStdString(vs.at(0)),
+                             QString::fromStdString(vs.at(1)),    //消息接受这ID
                              QString::fromStdString("."),
                              QString::fromStdString(vs.at(2))});
+}
+void FC_Display::recv(std::vector<std::string> vs){//display receive message
+    std::cout <<"count打印测试"<<vs.at(2);
+    this->_list_model->recv({QString::fromStdString(vs.at(0)),    //好友id
+                             QString::fromStdString(vs.at(1)),    //消息接受这ID,也就是当前客户id
+                             QString::fromStdString("."),
+                             QString::fromStdString(vs.at(2))});    //消息
+
+    cout<<"_list_recv_model:"<<vs.at(0)<<"  :   "<<vs.at(1)<<endl;
+
+    this->_chat_listModel->add({QString::fromStdString(vs.at(0)),
+                                 QString::fromStdString(vs.at(2))});
 }
 void FC_Display::show(){
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -67,6 +83,7 @@ void FC_Display::show(){
     _engine->rootContext()->setContextProperty("profilemsg",_profilemsg);
     _engine->rootContext()->setContextProperty("buddy",_buddy);
     _engine->rootContext()->setContextProperty("friends_handle",_fhandle);
+    _engine->rootContext()->setContextProperty("chat_listModel",this->_chat_listModel);
     this->_engine->rootContext()->setContextProperty("message_listModel",this->_list_model);
     this->_engine->load(QUrl(QStringLiteral("qrc:/qml/Fc_MainWindow.qml")));
 //    this->_engine->load(QUrl(QStringLiteral("qrc:/Login.qml")));

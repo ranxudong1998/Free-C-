@@ -13,12 +13,13 @@
 
 DbBroker* FC_Server::_broker = new DbBroker ();
 FC_Server::FC_Server(int thread_num,int port){
-//    _broker = new DbBroker(this);
+    //    _broker = new DbBroker(this);
     init_accounts();
     this->_thread_pool = new FC_Thread_Pool(thread_num);
     this->_accrptor = new FC_Acceptor(this,port);
     this->_thread_pool->init_thread_pool();
-
+    
+    
 }
 FC_Server::~FC_Server(){
     delete this->_thread_pool;
@@ -48,7 +49,7 @@ void FC_Server::handle_connected(FC_Connection* connection)
 }
 void FC_Server::erase_connection(FC_Connection* connection)
 {
-
+    
     for(size_t i=0;i<_connected.size();++i){
         if(_connected[i]==connection){
             std::swap(_connected[i],_connected[_connected.size()-1]); //和最后一个交换位置
@@ -56,7 +57,7 @@ void FC_Server::erase_connection(FC_Connection* connection)
             break;
         }
     }
-     //这里还需要erase在线的好友列表
+    //这里还需要erase在线的好友列表
     for(auto it = this->_onlineP.begin();it !=this->_onlineP.end();)
     {
         if(it->second == connection)
@@ -65,33 +66,37 @@ void FC_Server::erase_connection(FC_Connection* connection)
             it++;
     }
     qDebug()<<"this->_onlineP.size:"<<this->_onlineP.size();
-
+    
     delete connection; //delete之后调用析构函数会关掉_socket
 }
 
+
 //group chat,这个使用来群聊发送的
-void FC_Server::forward_message(FC_Message* msg){
-    for (auto i=_connected.begin();i!=_connected.end();++i) {
-        FC_Message* tmp_msg = new FC_Message(*msg);
-       (*i)->write(tmp_msg);
-    }
-    delete msg;
+void FC_Server::forward_group_message(std::string id,string senderId, FC_Message *msg)
+{
+    std::vector<string> tmp ={"@12345","@24567","@13456"}; //差@23456
+    this->_groupInfo.insert({{"@56789",tmp}});
+     std::unordered_map<std::string,vector<std::string>>::iterator iter = this->_groupInfo.find(id);
+     for(auto i = 0; i < iter->second.size() ;i++){
+         if(iter->second.at(i)!= senderId)
+            forward_message(iter->second.at(i),msg);
+     }
 }
 
 //这个是端对端发送
 void FC_Server:: forward_message(string id,FC_Message* msg){
-
+    
     for (auto i=_onlineP.begin();i!=_onlineP.end();++i) {
-       if(i->first==id){
+        if(i->first==id){
             FC_Message* tmp_msg = new FC_Message(*msg);
             i->second->write(tmp_msg);
-       }
+        }
     }
 }
 
 //profile about
 void FC_Server::add_identified(string s,FC_Connection* c){
-//    this->_identified[s] = c;
+    //    this->_identified[s] = c;
     this->_onlineP[s] = c;
 }
 
@@ -108,9 +113,9 @@ void FC_Server::init_accounts()
 
 bool FC_Server::login_verify(const string &acc, const string &pass)
 {
-   if(_accounts[acc] == pass)
-       return true;
-   return false;
+    if(_accounts[acc] == pass)
+        return true;
+    return false;
 }
 
 void FC_Server::set_accounts(const string &acc, const string &pass)
@@ -152,14 +157,15 @@ std::unordered_map<std::string, FC_Connection *> FC_Server::get_onlineP()
     return this->_onlineP;
 }
 
-unordered_map<std::string, vector<FC_Message *> > FC_Server::get_offlineM()
+unordered_map<std::string, std::queue<FC_Message *> > &FC_Server::get_offlineM()
 {
     return this->_offlineM;
 }
 
+
 void FC_Server::set_offlineM(const std::string &acc, FC_Message *msg)
 {
-    this->_offlineM[acc].push_back(msg);
+    this->_offlineM[acc].push(msg);
 }
 
 //==============================================

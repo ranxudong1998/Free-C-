@@ -104,6 +104,7 @@ Page{
         x: 0
         y: 190
         text: "添加好友"
+        visible: acc.text && buddy.visShow== false? true : false
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 490
         width: parent.width
@@ -111,6 +112,22 @@ Page{
             console.log("add Friends")
             friends_handle.add_friends(acc.text)
             //请求添加为好友的信息
+        }
+    }
+    Button{
+        id:sendButton
+        x: 0
+        y: 190
+        text: "发送消息"
+        visible: buddy.visShow
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 490
+        width: parent.width
+        onClicked: {
+            message_listModel.set_currentChatId(buddy.account);
+
+            __PushPage(Qt.resolvedUrl("../Chat/ChatPage.qml"),
+                       {s_userid:buddy.account,s_username:buddy.nickname});
         }
     }
 

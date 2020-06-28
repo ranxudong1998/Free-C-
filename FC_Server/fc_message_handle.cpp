@@ -25,6 +25,7 @@ using namespace boost::property_tree;
 FC_Message_Handle::FC_Message_Handle(FC_Server* server,FC_Connection *connection )
     :_server(server),_connection(connection)
 {
+    
 }
 
 void FC_Message_Handle::handle_header(FC_Message *message){
@@ -32,7 +33,7 @@ void FC_Message_Handle::handle_header(FC_Message *message){
 }
 
 void FC_Message_Handle::handle_body(FC_Message* message){
-    int type = message->mess_type();
+    unsigned type = message->mess_type();
     //according message type handle message
     if(type&FC_PROFILE){
         switch (type) {
@@ -85,8 +86,14 @@ void FC_Message_Handle::handle_body(FC_Message* message){
             break;
         }
     }else if(type & FC_MESSAGES){
-        if(type&FC_TEXT_MEG)
+        switch (type) {
+        case FC_TEXT_MEG:
             handle_text_msg(message);
+            break;
+        case FC_GROUP_TEXT_MEG:
+            handle_group_text_msg(message);
+            break;
+        }
     }else{
         qDebug() << "unknow message type:" << message->mess_type();
     }
@@ -94,12 +101,10 @@ void FC_Message_Handle::handle_body(FC_Message* message){
 
 
 FC_Message* FC_Message_Handle::generate_message(unsigned type,const char* content,char* account,char* s_accout){
-    //use the copy of the content
-    //sizeof (a) = strlen(a)+1;
+
     FC_Message* message = new FC_Message;//delete in on_write()
-    //message->set_message_type(type);
+
     unsigned msg_size = strlen(content)+1;
-//    message->set_header(type,msg_size,account,s_accout);
     message->set_body(content,msg_size);
     return message;
 }
@@ -391,9 +396,10 @@ void FC_Message_Handle::handle_offlineM(const string &acc)
     //处理离线消息
     if(_server->get_offlineM().count(acc) !=0 )
     {
-        for(const auto &each : _server->get_offlineM()[acc]) //输出相应的消息容器
-        {
-            _server->forward_message(acc,each);
+        while (!_server->get_offlineM()[acc].empty()) {
+            qDebug()<<"存在离线消息";
+            _server->forward_message(acc,_server->get_offlineM()[acc].front()); //取队头元素
+            _server->get_offlineM()[acc].pop(); //弹出队头元素
         }
     }
 }
@@ -408,7 +414,6 @@ void FC_Message_Handle::handle_ordinary_msg(FC_Message* message){
 
 }
 void FC_Message_Handle::handle_sign_in(const char* s){
-    this->_server->add_identified(s,this->_connection);
     char* account = new char[FC_ACC_LEN+1];
     memset(account,'\0',FC_ACC_LEN+1);
     memcpy(account,s,FC_ACC_LEN);
@@ -433,21 +438,31 @@ void FC_Message_Handle::handle_sign_in(const char* s){
 }
 
 void FC_Message_Handle::handle_text_msg(FC_Message* msg){
-//    this->_server->forward_message();
-
-//    char s_account[FC_ACC_LEN];
-//    memcpy(s_account,msg->header()+sizeof (unsigned)*4,FC_ACC_LEN);
-//    char *content = msg->body();
-////    this->_server->forward_message(QString(s_account),msg);
-//    std::cout<< s_account<<std::endl;
-//    std::cout<<content<<std::endl;
-
     char s_account[FC_ACC_LEN];  //保存消息接受者账号
     memcpy(s_account,msg->header()+14,FC_ACC_LEN);  //4+4+6
     char *content = msg->body();
-    this->_server->forward_message(string(s_account),msg);
+     this->_server->forward_message(string(s_account),msg);
     std::cout<< s_account<<std::endl;
     std::cout<<content<<std::endl;
+}
+
+void FC_Message_Handle::handle_group_text_msg(FC_Message *msg)
+{
+
+
+    char* w_account =new char[7];    //保存消息接受者账号(群账号)
+    memset(w_account,'\0',7);
+    char* m_account =new char[7];    //保存消息接受者账号(群账号)
+    memset(m_account,'\0',7);
+    memcpy(w_account,msg->header()+8,FC_ACC_LEN);
+    memcpy(m_account,msg->header()+14,FC_ACC_LEN);
+    char *content = msg->body()+12;  //消息内容
+    qDebug()<<"群消息: "<<content;
+  
+    this->_server->forward_group_message(string(m_account),string(w_account),msg);
+    free(m_account);
+    free(w_account);
+
 }
 
 std::string FC_Message_Handle::handle_user_head(const string &filepath)

@@ -37,6 +37,7 @@ HEADERS += fc_buddy.h \
            fc_message_listmodel.h \
            fc_profile.h \
            fc_profile_handle.h \
+           fc_chat_listmodel.h\
            fc_thread_pool.h
 
 SOURCES += fc_buddy.cpp \
@@ -54,5 +55,6 @@ SOURCES += fc_buddy.cpp \
            fc_profile.cpp \
            fc_profile_handle.cpp \
            fc_thread_pool.cpp \
+           fc_chat_listmodel.cpp\
            main.cpp
 RESOURCES += qml.qrc

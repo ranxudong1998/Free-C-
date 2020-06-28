@@ -97,9 +97,6 @@ Page{
                     selectionColor: "#02020a"
                     font.pixelSize: 14
 
-                    onTextChanged: {
-                        buttonText.text = "搜索"
-                    }
                 }
 
             }
@@ -114,7 +111,7 @@ Page{
             Text {
                 id: buttonText
                 anchors.fill: parent
-                text: qsTr("取消")
+                text: textInputSearch.text.length ? qsTr("搜索") : qsTr("取消")
                 font.pointSize: 14
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter

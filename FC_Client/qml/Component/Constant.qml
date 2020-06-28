@@ -52,6 +52,8 @@ QtObject {
     readonly property url newfriendsIcon: icons.labelIcon("new-fri")                        // 新的朋友
     readonly property url friendlistright: icons.labelIcon("right")                         // 分组箭头
 
+    readonly property url addchatIcon: icons.chatIcon("add")
+
     readonly property url shareExcelIcon: icons.share("share-excel")
     readonly property url shareFileIcon: icons.share("share-file")
     readonly property url shareMusicIcon: icons.share("share-music")
@@ -82,6 +84,10 @@ QtObject {
 
         function inactiveIcon(name) {
             return Qt.resolvedUrl(iconsPath + "bar-icons/inactive/" + name +".png")
+        }
+
+        function chatIcon(name){
+            return Qt.resolvedUrl(iconsPath + "bar-icons/" + name +".png")
         }
 
         function sampleIcon(name) {

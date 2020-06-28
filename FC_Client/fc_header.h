@@ -23,6 +23,7 @@
 //part one -- message about
 #define FC_MESSAGES unsigned(1<<31)
 #define FC_TEXT_MEG unsigned(FC_MESSAGES | 1<<1)
+#define FC_GROUP_TEXT_MEG unsigned(FC_MESSAGES | 1 << 2)
 
 //part two -- friend about
 #define FC_FRIENDS              unsigned(1<<30)

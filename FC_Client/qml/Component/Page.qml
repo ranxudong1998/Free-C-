@@ -23,6 +23,7 @@ Rectangle {
     property Item background: null
     property TopBar topBar: null
     property BottomBar bottomBar: null
+    property BottomBar chatButtonBar: null
 
     Loader {
         id: panelLoader
@@ -32,6 +33,7 @@ Rectangle {
         Binding { target: topBar; property: "parent"; value: topBarParent }
         Binding { target: bottomBar; property: "parent"; value: bottomBarParent }
         Binding { target: background; property: "parent"; value:  backgroundParent}
+        Binding { target: chatButtonBar; property: "parent"; value: chatbottomBarParent}
 
         Item {
             id: backgroundParent
@@ -84,6 +86,16 @@ Rectangle {
                     children[0].destory();
                 }
             }
+        }
+
+        Item {
+            id: chatbottomBarParent
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.left: parent.left
+//            height: 100
+//            height: 50
+//            height: children[0] != null ? children[0].height: 0
         }
     }
 

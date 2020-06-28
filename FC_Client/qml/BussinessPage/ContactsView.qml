@@ -107,6 +107,7 @@ Page {
             font.pointSize: 15
             anchors.centerIn: parent
             anchors.right: rectangle1.right
+
         }
         Separator {
             color: "black"
@@ -117,9 +118,12 @@ Page {
         }
         MouseArea{
             id:groupchat
+            anchors.fill: parent;
             onClicked: {
+                __PushPage(Qt.resolvedUrl("./Contact/GroupList.qml"));
             }
         }
+
     }
 
     ListView{
@@ -175,7 +179,6 @@ Page {
                 Row{
                     id:objItem
                     spacing: 10
-//                    leftPadding: 20
 
                     Image {
                         id: icon
@@ -229,13 +232,13 @@ Page {
                        //使其位于margin
                    }
                    Column{
+                       id:col
                        anchors{
                            left: fileicon.right
                            leftMargin: 20
                            top: parent.top
                            topMargin:20
                        }
-//                       topPadding: 10
                        spacing: 10
 
                        Label{
@@ -248,6 +251,13 @@ Page {
                            font.pointSize: constant.middleFontPointSize+1.0
                        }
                    }
+//                   Separator {
+//                       color: "black"
+//                       orientation: Qt.Horizontal
+//                        anchors.top: rect.bottom
+//                       anchors.left: fileicon.right
+//                       anchors.leftMargin: 10
+//                   }
                    MouseArea{
                     anchors.fill: rect
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -294,6 +304,11 @@ Page {
         __PushPage(Qt.resolvedUrl("./ProfilePage.qml"),
                    {s_userid:userid,s_username: username } );}
 
+    }
+    Connections{
+        target: teamModel
+        //这里更新model
+        onTeamsChanged:listView.model = teamModel.teams
     }
 }
 

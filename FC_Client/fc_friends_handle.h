@@ -8,8 +8,9 @@
 using namespace std;
 
 class FC_Client;
-class FC_BuddyListCtrl;
+class FC_Message_Handle;
 class BuddyModel;
+class BuddyItem;
 
 class FC_Friends_Handle : public QObject
 {
@@ -23,11 +24,14 @@ public:
     Q_INVOKABLE void delete_friend(const QString &team,const QString &item);
     Q_INVOKABLE void validation_request(const QString& result);
 
-//    void update_remark(char* content);
     void displaytoQML(FC_Message* message);
     void refresh_friends_list(const string& msg);
 
     void parser_friends_json(const std::string& content);
+
+
+    unordered_map<string,BuddyItem*>& get_item();
+    void set_item(string& acc,BuddyItem* item);
 private:
     void search_show(const string& msg);
     void add_friends_show(const string& msg);
@@ -36,9 +40,12 @@ private:
     std::string QStrTostr(QString& qstr);
     char* stringTochar(const std::string &str);
 
+    unordered_map<string,BuddyItem*> _items;
+    vector<int> _vec;
 
     FC_Client* _client = nullptr;
     BuddyModel* _model  = nullptr; //好友结果model
 };
+
 
 #endif // FC_FRIENDS_HANDLE_H
