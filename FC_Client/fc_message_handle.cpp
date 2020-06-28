@@ -123,7 +123,8 @@ void FC_Message_Handle::handle_text_msg(FC_Message* msg){
     free(m_account);
 }
 
-void FC_Message_Handle::handle_group_text_msg(FC_Message *msg)
+void FC_Message_Handle::
+handle_group_text_msg(FC_Message *msg)
 {
     char* w_account = new char[7];
     memset(w_account,'\0',7);

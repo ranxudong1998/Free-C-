@@ -29,8 +29,8 @@ FC_Display::FC_Display(FC_Client* client,FC_Profile* profile)
     _fhandle = new FC_Friends_Handle(client);
     //_profile = new FC_Profile (client);
     _buddy = Buddy::getInstance();
-    this->_list_model = new FC_Message_ListModel(_client);
-    this->_chat_listModel = new FC_Chat_ListModel(_client);
+    this->_chat_listModel = new FC_Chat_ListModel();
+   this->_list_model = new FC_Message_ListModel(_client,_chat_listModel);
 
 
 }
@@ -66,18 +66,18 @@ void FC_Display::recv(std::vector<std::string> vs){//display receive message
 
     cout<<"_list_recv_model:"<<vs.at(0)<<"  :   "<<vs.at(1)<<endl;
 
-    this->_chat_listModel->add({QString::fromStdString(vs.at(0)),
-                                 QString::fromStdString(vs.at(2))});
+//    this->_chat_listModel->add({QString::fromStdString(vs.at(0)),
+//                                 QString::fromStdString(vs.at(2))});
 }
 void FC_Display::show(){
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     int argc=0;
     this->_app_ui = new QGuiApplication(argc,nullptr);
     this->_engine = new QQmlApplicationEngine;
-    
+
     qmlRegisterType<BuddyItem>("buddy",1,0,"BuddyItem");
     qmlRegisterType<BuddyTeam>("buddy",1,0,"BuddyTeam");
-    
+
     _engine->rootContext()->setContextProperty("teamModel",_model);
     _engine->rootContext()->setContextProperty("profile_handle",_profile);
     _engine->rootContext()->setContextProperty("profilemsg",_profilemsg);

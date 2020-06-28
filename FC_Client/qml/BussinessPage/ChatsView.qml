@@ -1,4 +1,3 @@
-
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.0
@@ -19,45 +18,46 @@ Page {
         height: chatsView.height
 
         model: chat_listModel
-//        model: fmsgmodel
 
-        add: Transition {
-            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
-            NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 400 }
-        }
-        move: Transition {
-            NumberAnimation { properties: "x,y"; duration: 800; easing.type: Easing.OutBack }
-        }
-        displaced: Transition {
-            NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutBounce }
-        }
 
-        //scrollbar移动效果
-        states: [
-            State {
-                name: "ShowBar"
-                when: listView.movingVertically
-                PropertyChanges { target: verticalScrollBar; opacity: 0}
-            },
-            State {
-                name: "HideBar"
-                when: !listView.movingVertically
-                PropertyChanges { target: verticalScrollBar; opacity: 1}
-            }
-        ]
 
-        transitions: [
-            Transition {
-                from: "ShowBar"
-                to: "HideBar"
-                NumberAnimation { properties: "opacity"; duration: 400 }
-            },
-            Transition {
-                from: "HideBar"
-                to: "ShowBar"
-                NumberAnimation { properties: "opacity"; duration: 400 }
-            }
-        ]
+//        add: Transition {
+//            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
+//            NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 400 }
+//        }
+//        move: Transition {
+//            NumberAnimation { properties: "x,y"; duration: 800; easing.type: Easing.OutBack }
+//        }
+//        displaced: Transition {
+//            NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutBounce }
+//        }
+
+//        //scrollbar移动效果
+//        states: [
+//            State {
+//                name: "ShowBar"
+//                when: listView.movingVertically
+//                PropertyChanges { target: verticalScrollBar; opacity: 0}
+//            },
+//            State {
+//                name: "HideBar"
+//                when: !listView.movingVertically
+//                PropertyChanges { target: verticalScrollBar; opacity: 1}
+//            }
+//        ]
+
+//        transitions: [
+//            Transition {
+//                from: "ShowBar"
+//                to: "HideBar"
+//                NumberAnimation { properties: "opacity"; duration: 400 }
+//            },
+//            Transition {
+//                from: "HideBar"
+//                to: "ShowBar"
+//                NumberAnimation { properties: "opacity"; duration: 400 }
+//            }
+//        ]
 
 
         ScrollBar {
@@ -79,43 +79,42 @@ Page {
             color: "transparent"
             border.width: 1
             border.color: "#ccc"
-            state: "UnSelected"
-            states: [
-                State {
-                    name: "Selected"
-                    PropertyChanges { target:chatItem; color: "#ccc" }
-                },
-                State {
-                    name: "UnSelected"
-                    PropertyChanges { target:chatItem; color: "transparent" }
-                }
-            ]
+//            state: "UnSelected"
+//            states: [
+//                State {
+//                    name: "Selected"
+//                    PropertyChanges { target:chatItem; color: "#ccc" }
+//                },
+//                State {
+//                    name: "UnSelected"
+//                    PropertyChanges { target:chatItem; color: "transparent" }
+//                }
+//            ]
 
-            transitions: [
-                Transition {
-                    from: "Selected"
-                    to: "UnSelected"
-                    NumberAnimation { properties: "color"; duration: 400 }
-                },
-                Transition {
-                    from: "UnSelected"
-                    to: "Selected"
-                    NumberAnimation { properties: "color"; duration: 400 }
-                }
-            ]
+//            transitions: [
+//                Transition {
+//                    from: "Selected"
+//                    to: "UnSelected"
+//                    NumberAnimation { properties: "color"; duration: 400 }
+//                },
+//                Transition {
+//                    from: "UnSelected"
+//                    to: "Selected"
+//                    NumberAnimation { properties: "color"; duration: 400 }
+//                }
+//            ]
 
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: spacing
                 Image {
-                    width: headPrtraitSize-20
-                    height: headPrtraitSize-20
+                    width: headPrtraitSize
+                    height: headPrtraitSize
                     anchors.verticalCenter: parent.verticalCenter
-                    sourceSize.width: headPrtraitSize - 20
-                    sourceSize.height: headPrtraitSize - 20
-//                    source: "../resource/tests/tests001.jpeg"
+                    sourceSize.width: headPrtraitSize - 2
+                    sourceSize.height: headPrtraitSize - 2
+                    //source: "../resource/tests/tests001.jpeg"
                     source: imagePath
-
                     fillMode: Image.PreserveAspectFit
                     //clip: true
                 }
@@ -158,37 +157,38 @@ Page {
                 }
             }
         }
-
-        Menu {
-            id: chatItemMenu
-            property int chatItemIndex: 0
-            MenuItem {
-                text: qsTr("Delete conversation")
-                onTriggered: {
-                    listView.model.remove(chatItemMenu.chatItemIndex);
-                }
-            }
-            MenuItem {
-                text: qsTr("Sticky on top")
-                onTriggered: {
-                    listView.model.move(chatItemMenu.chatItemIndex, 0, 1);
-                }
-            }
-            MenuItem {
-                text: qsTr("Clear")
-                onTriggered: {
-                    listView.model.clear();
-                }
-            }
-        }
+//        Menu {
+//            id: chatItemMenu
+//            property int chatItemIndex: 0
+//            MenuItem {
+//                text: qsTr("Delete conversation")
+//                onTriggered: {
+//                    listView.model.remove(chatItemMenu.chatItemIndex);
+//                }
+//            }
+//            MenuItem {
+//                text: qsTr("Sticky on top")
+//                onTriggered: {
+//                    listView.model.move(chatItemMenu.chatItemIndex, 0, 1);
+//                }
+//            }
+//            MenuItem {
+//                text: qsTr("Clear")
+//                onTriggered: {
+//                    listView.model.clear();
+//                }
+//            }
+//        }
 
     }
 
     Connections{
         target: chat_listModel
         onUpdate_mess:{
+
 //            listView.currentIndex = listView.count - 1;
-            console.log("一条记录发生改变")
+            console.log( "GET IT ")
+
         }
     }
 
@@ -199,12 +199,13 @@ Page {
 
 
     }
-//    Timer{
-//        interval: 1000
-//        running: true
-//        repeat: true
-//        onTriggered: console.log("timer triggered")
-//    }
+    MouseArea{
+        anchors.fill: parent;
+        onClicked: {
+            console.log( " click!")
+            console.log( listView.count )
+        }
+    }
 
 }
 

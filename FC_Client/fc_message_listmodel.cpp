@@ -15,12 +15,11 @@ namespace fs =std::filesystem ;
 //==============================================
 
 
-FC_Message_ListModel::FC_Message_ListModel(FC_Client*client, QObject* parent)
-    :QAbstractListModel(parent),_client(client)
+FC_Message_ListModel::FC_Message_ListModel(FC_Client*client,FC_Chat_ListModel* chat_list_model, QObject* parent)
+    :QAbstractListModel(parent),_client(client),_chat_listModel(chat_list_model)
 {
 
     _instace = new FC_Message_Instance(_client);
-    _chat_listModel = new FC_Chat_ListModel(_client);
     QVector<QVector<QString>> tmp;
     _all_mess.insert("@12345",tmp);
     _all_mess.insert("@24567",tmp);
@@ -63,7 +62,7 @@ void FC_Message_ListModel::add_msg_to_socket(QVector<QString> content)
 QString FC_Message_ListModel::get_head_path(QString id)
 {
 
-    fs::path p = fs::current_path(); //目的是为了得到绝对路径
+    fs::path p = fs::current_path(); //目的是为了得到相对路径
     std::string tmpAccount = id.toStdString();
     std::string path = "file://"+p.string()+"/assert/"+tmpAccount+".jpg";
     QString headpath = QString::fromLocal8Bit(path.c_str());
@@ -86,13 +85,15 @@ QHash<int, QByteArray> FC_Message_ListModel::roleNames() const{
 
 //transfer function
 void FC_Message_ListModel::add(QVector<QString> content){// display to socket
-    add_msg_to_socket(content); //传送给了服务端
+    add_msg_to_socket(content);
     QString tmpPathLeft= get_head_path(content.at(1));
     QString tmpPathRight = get_head_path(content.at(0));
     content.push_back(tmpPathLeft);         //添加对应头像路径
     content.push_back(tmpPathRight);
-    content.push_back("0"); //设置可见还是不可见
     handle_own_msg(content);
+//    this->_chat_listModel->handle_last_msg({content.at(1),content.at(3),"23"});
+    this->_chat_listModel->set_last_msg({content.at(1),content.at(3),content.at(4)});
+    set_msgOpacity(false);
 
     beginInsertRows(QModelIndex(),rowCount(),rowCount());
     //消息直接在UI上打印
@@ -103,17 +104,17 @@ void FC_Message_ListModel::add(QVector<QString> content){// display to socket
 void FC_Message_ListModel::recv(QVector<QString> content){// socket to display
 
     //添加对应头像路径
-    //这里也可以直接调用 好友列表的接口，不需要自己重新获取头像路径
     QString tmpPathLeft= get_head_path(content.at(0));
     QString tmpPathRight = get_head_path(content.at(1));
     content.push_back(tmpPathLeft);
     content.push_back(tmpPathRight);
-    content.push_back("1");
     handle_recv_msg(content);
+    this->_chat_listModel->set_last_msg({content.at(0),content.at(3),content.at(4)});
     //检测是否为当前聊天信息
     if(content.at(0) !=this->currentChatId()){
         return;
     }
+    set_msgOpacity(true);
     beginInsertRows(QModelIndex(),rowCount(),rowCount());
     //消息直接在UI上打印
     this->_instace->recv(content);
@@ -129,7 +130,7 @@ void FC_Message_ListModel::recv_group(QVector<QString> content)
     if(content.at(1) !=this->currentChatId()){
         return;
     }
-//    set_msgOpacity(true);
+    set_msgOpacity(true);
     beginInsertRows(QModelIndex(),rowCount(),rowCount());
     //消息直接在UI上打印
     this->_instace->recv(content);
@@ -148,12 +149,14 @@ void FC_Message_ListModel::loadMsg(QString key)
 
         //消息直接在UI上打印
         if(iter.value().at(i).at(0) == key){
+            set_msgOpacity(true);
             //添加对应头像路径
             beginInsertRows(QModelIndex(),rowCount(),rowCount());
             this->_instace->recv(iter.value().at(i));
             endInsertRows();
             emit recv_mess();
-        }else {      
+        }else {
+            set_msgOpacity(false);
             beginInsertRows(QModelIndex(),rowCount(),rowCount());
             this->_instace->add(iter.value().at(i));
             endInsertRows();
@@ -172,18 +175,19 @@ void FC_Message_ListModel::set_currentChatId(QString id)
 {
     this->_currentChatId = id;
     loadMsg(id);
+
 }
 
 
-//bool FC_Message_ListModel::msgOpacity() const
-//{
-//    return this->_msgOpacity;
-//}
+bool FC_Message_ListModel::msgOpacity() const
+{
+    return this->_msgOpacity;
+}
 
-//bool FC_Message_ListModel::set_msgOpacity(bool tmp)
-//{
-//    return this->_msgOpacity = tmp;
-//}
+bool FC_Message_ListModel::set_msgOpacity(bool tmp)
+{
+    return this->_msgOpacity = tmp;
+}
 
 
 

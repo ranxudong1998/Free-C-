@@ -5,27 +5,22 @@
 #include <fstream>
 #include <filesystem>
 #include <string>
-#include "fc_client.h"
-#include "fc_buddyitem.h"
 
 namespace fs =std::filesystem ;
 
 
-
-FC_Chat_ListModel::FC_Chat_ListModel(FC_Client *client, QObject *parent)
-    :QAbstractListModel(parent),_client(client)
+FC_Chat_ListModel::FC_Chat_ListModel(QObject *parent) : QAbstractListModel(parent)
 {
-
-}
-
-FC_Chat_ListModel::~FC_Chat_ListModel()
-{
+    int i = Qt::DisplayRole;
+    this->_roles.insert(i++,"userName");
+    this->_roles.insert(i++,"lastContent");
+    this->_roles.insert(i++,"imagePath");
 
 }
 
 QVariant FC_Chat_ListModel::data(const QModelIndex &index, int role) const
 {
-    //return this->_data.at(index.row()).at(role);
+
     if(index.row() <0 || index.row() >= _data.size())
     {
         return QVariant();
@@ -36,81 +31,53 @@ QVariant FC_Chat_ListModel::data(const QModelIndex &index, int role) const
         return this->_data.at(index.row()).at(1);
     else if(role == 2)
         return this->_data.at(index.row()).at(2);
+    return this->_data.at(index.row()).at(role);
 }
 
-int FC_Chat_ListModel::rowCount(const QModelIndex &parent) const
+int FC_Chat_ListModel::rowCount(const QModelIndex &) const
 {
-    Q_UNUSED(parent)
-     return this->_data.size();//函数返回模型中的项目总数
+    return this->_data.size();//函数返回模型中的项目总数
 }
 
 QHash<int, QByteArray> FC_Chat_ListModel::roleNames() const
 {
-    QHash<int,QByteArray> _hash;
-    _hash[0] = "userName"; //昵称
-    _hash[1] = "imagePath"; //头像
-    _hash[2] = "lastContent"; //信息
-
-    return _hash;
+    return this->_roles;
 }
 
-void FC_Chat_ListModel::add(QVector<QString> content)
-{
-    //这里需要判断这条记录的用户id是否显示过，需要把服务端中传过来的数据，全部添加进_all_last_msg容器中，设置该容器和model的转换
-//    if(_all_last_msg.count(content.at(0)) == 0) //表明最后一条历史记录中没有
-//    {
-        //0是用户标识，2是消息信息
-         BuddyItem* item = _client->get_item()[content.at(0).toStdString()];
-         QVector<QString> temp;
-          //0 是昵称 1是头像 2是内容
-         temp.push_back(item->nickname()); //这里还可以判断下，有无备注，如果有备注则传入备注，没有备注，则传入昵称
-         temp.push_back(item->heading());
-         temp.push_back(content.at(1));//内容
-         beginInsertRows(QModelIndex(),rowCount(),rowCount());
-         this->_data.push_back(temp);
-         endInsertRows();
-         emit update_mess();
-//    }else{ //表明有这个用户，则只需要进行修改
-//        _all_last_msg[content.at(0)][2] = content.at(1);
-//        emit update_mess();
-//    }
 
-}
+void FC_Chat_ListModel::add(){
 
-//recv和add代码可以合并 内容相同
-void FC_Chat_ListModel::recv(QVector<QString> content)
-{
-    //为了方面查找 所有用户信息都存在表 _client->get_item()这个hash表中，需要信息可以直接在hash表中查找
-    BuddyItem* item = _client->get_item()[content.at(0).toStdString()];
-    QVector<QString> temp;
-    temp.push_back(item->nickname()); //这里还可以判断下，有无备注，如果有备注则传入备注，没有备注，则传入昵称
-    temp.push_back(item->heading());
-    temp.push_back(content.at(1));//内容
-    beginInsertRows(QModelIndex(),rowCount(),rowCount());
-    this->_data.push_back(temp);
-    endInsertRows();
+    beginRemoveRows(QModelIndex(),0,rowCount());
+    this->_data.clear();
+    endRemoveRows();
     emit update_mess();
+    QVector<QVector<QString>>temp (_data);
+
+    LastMsgVector::iterator iter =this->_all_last_msg.find(this->_one_last_msg.at(0));  //检索key
+    if(iter == this->_all_last_msg.end()){
+        _all_last_msg.insert(this->_one_last_msg.at(0),this->get_last_msg());
+    }else {
+        iter.value() =this->get_last_msg();
+        qDebug()<<"fjsdafsoai";
+    }
+
+    LastMsgVector::iterator tmpIter = this->_all_last_msg.begin();
+    while(tmpIter != this->_all_last_msg.end()){
+        beginInsertRows(QModelIndex(),rowCount(),rowCount());
+        //消息直接在UI上打印
+        this->_data.push_back(tmpIter.value());
+        endInsertRows();
+        emit update_mess();
+        ++tmpIter;
+    }
 }
 
-//存储所有账号对应的最后一条消息
-void FC_Chat_ListModel::handle_last_msg(QVector<QString> content)
+QVector<QString> FC_Chat_ListModel::get_last_msg()
 {
+    return this->_one_last_msg;
+}
 
-//    if(_all_last_msg.count(content.at(0))) //表明存在这个用户
-//    {
-
-//    }else //表明不存在这个用户，则插入一条消息
-//    {
-
-//    }
-//     LastMsgVector::iterator iter =this->_all_last_msg.find(content.at(0));  //检索key
-//     iter.value() =content;
-
-     beginInsertRows(QModelIndex(),rowCount(),rowCount());
-//     消息直接在UI上打印
-     this->_data.push_back(content);
-     std::cout<<"this->_data.size()"<<this->_data.size()<<std::endl;
-     endInsertRows();
-     emit update_mess();
-    // this->_data.clear();
+void FC_Chat_ListModel::set_last_msg(QVector<QString> msg)
+{
+    this->_one_last_msg = msg;
 }

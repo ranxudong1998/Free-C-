@@ -16,7 +16,7 @@ class FC_Message_ListModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    FC_Message_ListModel(FC_Client*client, QObject* parent=nullptr);
+    FC_Message_ListModel(FC_Client*client,FC_Chat_ListModel* chat_list_model, QObject* parent=nullptr);
     ~FC_Message_ListModel();
 
      MsgVector::iterator handle_recv_msg(QVector<QString> content);
@@ -33,14 +33,14 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
     Q_PROPERTY(QString currentChatId READ currentChatId WRITE set_currentChatId)
-//    Q_PROPERTY(bool msgOpacity READ msgOpacity WRITE set_msgOpacity)
+    Q_PROPERTY(bool msgOpacity READ msgOpacity WRITE set_msgOpacity)
 
     QString currentChatId() const;
-//    bool msgOpacity() const;
-//    bool set_msgOpacity(bool tmp);
+    bool msgOpacity() const;
+    bool set_msgOpacity(bool tmp);
 
-    Q_INVOKABLE void add(QVector<QString> mess);// 显示在qml
-    void recv(QVector<QString> content);// 显示在qml
+    Q_INVOKABLE void add(QVector<QString> mess);// display to socket
+    Q_INVOKABLE void recv(QVector<QString> content);// socket to display
     Q_INVOKABLE void recv_group(QVector<QString> content);// socket to display
 
     Q_INVOKABLE void loadMsg(QString key);// 当打开一个chatPage时,刷新消息
@@ -51,13 +51,15 @@ public:
 
 signals:
     void recv_mess();
+
+
 private:
     FC_Client* _client = nullptr;
     FC_Message_Instance* _instace = nullptr;
     FC_Chat_ListModel* _chat_listModel;
     MsgVector _all_mess;   //存储所有的消息 <消息发送者id,对行id的所有消息>
     QString _currentChatId;  //当前聊天对象Id
-//    bool _msgOpacity;           //设置消息的左右显示,0表示右边显示,1表示左边显示 在每一个model实例中设置
+    bool _msgOpacity;           //设置消息的左右显示,0表示右边显示,1表示左边显示
 
 
 };

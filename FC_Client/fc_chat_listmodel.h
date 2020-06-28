@@ -21,30 +21,37 @@ typedef QHash <QString, QVector<QString>> LastMsgVector;
 class FC_Chat_ListModel : public QAbstractListModel
 {
     Q_OBJECT
+
 public:
-    FC_Chat_ListModel(FC_Client*client,QObject* parent=nullptr);
-    ~FC_Chat_ListModel();
+    FC_Chat_ListModel(QObject *parent = nullptr);
 
 
-   //override function
-   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; //index and role data
-   int rowCount(const QModelIndex &parent = QModelIndex()) const; //row count
+    //override function
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; //index and role data
+    int rowCount(const QModelIndex &parent = QModelIndex()) const; //row count
 
-   QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
-    Q_INVOKABLE void add(QVector<QString> mess);// 显示在qml
-   void recv(QVector<QString> content);// 显示在qml
+    Q_INVOKABLE void add();
 
 
-   void handle_last_msg(QVector<QString> content); //不用
+//    void handle_last_msg(QVector<QString> content);
+
+    QVector<QString> get_last_msg();
+    void set_last_msg(QVector<QString>);
 
 signals:
-   void update_mess();
+    void update_mess();
+
+
+    //   void test_signal();
 private:
-   QHash<int, QByteArray> _roles;//store rolename
-   QVector<QVector<QString>> _data; //store message
-   FC_Client* _client = nullptr;
-   LastMsgVector _all_last_msg;
+    bool m_bool;
+    QHash<int, QByteArray> _roles;//store rolename
+    QVector<QVector<QString>> _data; //store message
+    FC_Client* _client = nullptr;
+    LastMsgVector _all_last_msg;
+    QVector<QString> _one_last_msg;
 };
 
 #endif // FC_CHAT_LISTMODEL_H

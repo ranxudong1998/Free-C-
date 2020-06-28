@@ -2,9 +2,11 @@ TEMPLATE = app
 QT += quick
 CONFIG += console c++11 thread
 CONFIG -= app_bundle
+QT += sql
 #CONFIG -= qt
 
-LIBS +=/usr/local/boost_1_72_0/stage/lib/libboost_thread.a
+#LIBS +=/usr/local/boost_1_72_0/stage/lib/libboost_thread.a
+LIBS +=/usr/lib/libboost_thread.a
 
 SOURCES += \
         fc_acceptor.cpp \
