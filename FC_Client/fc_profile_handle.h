@@ -27,10 +27,14 @@ public:
     Q_INVOKABLE void login(const QString& acc,const QString& pass);
     Q_INVOKABLE void updateNick(const QString& acc);
     Q_INVOKABLE void updateGender(const QString& sex);
+    Q_INVOKABLE void updateHeading(const QString& filepath);
+    Q_INVOKABLE void registers(const QString& acc, const QString& pass);
+
 
 
     void update_nick(const QString& nick);
     void update_gender(const QString& sex);
+    void update_heading(const char* msg);
 
     void parser_json(const std::string& content);
 signals:

@@ -3,12 +3,18 @@
 #include "fc_client.h"
 #include "fc_instance_handle.h"
 #include "fc_chat_listmodel.h"
+#include "fc_base64encrypt.h"
+#include "fc_message.h"
 #include <QDebug>
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <zlib.h>
+#include <iostream>
+#include <fstream>
 
 namespace fs =std::filesystem ;
+using namespace std;
 
 //==============================================
 //  public function
@@ -43,6 +49,14 @@ MsgVector::iterator FC_Message_ListModel::handle_own_msg(QVector<QString> conten
     return iter;
 }
 
+void FC_Message_ListModel::handle_history(QVector<QString> content)
+{
+    if(content.at(1) ==  this->_m_id){
+        add(content);
+    }else {
+        recv(content);
+    }
+}
 
 MsgVector::iterator FC_Message_ListModel::handle_recv_msg(QVector<QString> content)
 {
@@ -85,15 +99,22 @@ QHash<int, QByteArray> FC_Message_ListModel::roleNames() const{
 
 //transfer function
 void FC_Message_ListModel::add(QVector<QString> content){// display to socket
-    add_msg_to_socket(content);
+    if(content.at(4).toInt() == 0) //text content
+        add_msg_to_socket(content); //传送给了服务端
+    else if(content.at(4).toInt() == 1) //file content
+    {
+        send_file(content.at(1),content.at(5));
+        content.removeLast();
+    }
+
     QString tmpPathLeft= get_head_path(content.at(1));
     QString tmpPathRight = get_head_path(content.at(0));
     content.push_back(tmpPathLeft);         //添加对应头像路径
     content.push_back(tmpPathRight);
+    content.push_back("0"); //设置可见还是不可见
     handle_own_msg(content);
-//    this->_chat_listModel->handle_last_msg({content.at(1),content.at(3),"23"});
-    this->_chat_listModel->set_last_msg({content.at(1),content.at(3),content.at(4)});
-    set_msgOpacity(false);
+    //这里传入的是账户 内容 头像
+    this->_chat_listModel->set_last_msg({content.at(1),content.at(3),content.at(5)});
 
     beginInsertRows(QModelIndex(),rowCount(),rowCount());
     //消息直接在UI上打印
@@ -102,19 +123,19 @@ void FC_Message_ListModel::add(QVector<QString> content){// display to socket
     emit recv_mess();
 }
 void FC_Message_ListModel::recv(QVector<QString> content){// socket to display
-
     //添加对应头像路径
+    //这里也可以直接调用 好友列表的接口，不需要自己重新获取头像路径
     QString tmpPathLeft= get_head_path(content.at(0));
     QString tmpPathRight = get_head_path(content.at(1));
     content.push_back(tmpPathLeft);
     content.push_back(tmpPathRight);
+    content.push_back("1");
     handle_recv_msg(content);
-    this->_chat_listModel->set_last_msg({content.at(0),content.at(3),content.at(4)});
+    this->_chat_listModel->set_last_msg({content.at(0),content.at(3),content.at(5)});
     //检测是否为当前聊天信息
     if(content.at(0) !=this->currentChatId()){
         return;
     }
-    set_msgOpacity(true);
     beginInsertRows(QModelIndex(),rowCount(),rowCount());
     //消息直接在UI上打印
     this->_instace->recv(content);
@@ -187,6 +208,60 @@ bool FC_Message_ListModel::msgOpacity() const
 bool FC_Message_ListModel::set_msgOpacity(bool tmp)
 {
     return this->_msgOpacity = tmp;
+}
+
+void FC_Message_ListModel::send_file(const QString &acc, const QString &filepath)
+{
+    string filename = fs::path(filepath.toStdString()).filename();
+    ifstream in(filepath.toStdString(),std::ios::binary);
+    if(!in.is_open())
+        qDebug()<<"open failed";
+
+    stringstream buffer;
+    buffer<<in.rdbuf();
+
+    string contents(buffer.str());
+
+    uLong  srcLength = contents.size();
+    uLong  destLength = compressBound(srcLength+1); //预期的压缩大小
+    char *dest = nullptr;
+    dest = new char[destLength];
+
+    cout<<"destLength:"<<destLength<<endl;
+
+    //压缩
+
+    if(compress((Bytef *)dest, &destLength, (Bytef *)contents.c_str(), srcLength) != Z_OK)
+     {
+       printf("compress failed!\n");
+       exit(0);
+     }
+
+    //加密
+    Base64Encrypt encrypt(dest,destLength);
+
+    string result = encrypt.GetString();
+    Json::Value root;
+    Json::FastWriter write;
+    root["name"]=filename; //写出来位置是颠倒的
+    root["content"] = result;//传过去的值，是减压后的值
+    root["length"] = contents.size();
+
+    string content = write.write(root);
+
+
+    FC_Message* msg = new FC_Message ();
+    msg->set_message_type(FC_FILE_MEG);
+    msg->set_body_length(content.size()+FC_ACC_LEN*2);
+    msg->set_self_identify(_client->getUniqueUserName().c_str());
+    msg->set_friend_identify(acc.toStdString().c_str());
+    msg->set_core_body(content.c_str(),content.size());
+
+
+//    msg->set_body(content.c_str(),content.size());
+    _client->add_msg_to_socket(msg);
+
+    //数据从200K变为了15.1k
 }
 
 

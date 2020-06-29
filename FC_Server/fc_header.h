@@ -13,9 +13,11 @@
 
 
 //part one -- message about
-#define FC_MESSAGES unsigned(1<<31)
-#define FC_TEXT_MEG unsigned(FC_MESSAGES | 1<<1)
-#define FC_GROUP_TEXT_MEG unsigned(FC_MESSAGES | 1 << 2)
+#define FC_MESSAGES             unsigned(1<<31)
+#define FC_TEXT_MEG             unsigned(FC_MESSAGES | 1<<1)
+#define FC_GROUP_TEXT_MEG       unsigned(FC_MESSAGES | 1 << 2)
+#define FC_TEXT_MEG_HISTORY     unsigned(FC_MESSAGES | 1<< 3)  //历史消息类型
+#define FC_FILE_MEG             unsigned(FC_MESSAGES | 1<<4) //发送文件消息
 
 //part two -- friend about
 #define FC_FRIENDS              unsigned(1<<30)

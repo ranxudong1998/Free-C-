@@ -51,6 +51,9 @@ QtObject {
     readonly property url groupchatIcon: icons.labelIcon("groupchat")                       // 群聊
     readonly property url newfriendsIcon: icons.labelIcon("new-fri")                        // 新的朋友
     readonly property url friendlistright: icons.labelIcon("right")                         // 分组箭头
+    readonly property url toolIcon: icons.labelIcon("ellipsis")                             // 工具栏
+    readonly property url fileIcon: icons.labelIcon("fileIcon")                             // 文件
+    readonly property url returnIcon: icons.labelIcon("return")                             // 返回
 
     readonly property url addchatIcon: icons.chatIcon("add")
 

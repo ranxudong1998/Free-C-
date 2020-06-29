@@ -129,3 +129,8 @@ void FC_Message::apply_memory(unsigned len){ //apply for new memory
     this->_data = tmp;
 }
 
+void FC_Message::set_header(unsigned type,unsigned int body_len){
+    memcpy(this->_data,&type,sizeof(unsigned));
+    memcpy(this->_data+sizeof (unsigned),&body_len,sizeof (unsigned));
+    this->apply_memory(this->mess_length());
+}

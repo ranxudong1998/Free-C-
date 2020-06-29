@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.4
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
@@ -106,14 +106,53 @@ Page {
 
             SampleButton {
                 Layout.alignment: Qt.AlignRight
+                visible: textInput.text.length ? true: false
                 text: qsTr("Send")
                 onClicked:  {
                     if(textInput.text != "" ) {
-                        //传入用户ID,消息接收端ID,时间,消息内容
-                        message_listModel.add([profilemsg.account,s_userid,"1",textInput.text])
+                        //传入用户ID,消息接收端ID,时间,消息内容,消息类型
+                        message_listModel.add([profilemsg.account,s_userid,"1",textInput.text,"0"])
                         //message_listModel.currentIndex = message_listModel.count - 1
                         textInput.text = "";
                     }
+                }
+            }
+            IconButton {
+                id:toolbutton
+                Layout.alignment: Qt.AlignRight
+                visible: textInput.text.length ? false: true
+                width: topBar.height * 0.9
+                height: topBar.height * 0.9
+                activeIconSource: constant.toolIcon
+                inactiveIconSource: constant.toolIcon
+                onClicked: {
+                    contextMenu.open()
+                }
+            }
+            //弹出菜单
+            Menu {
+                id: contextMenu
+                MenuItem {
+                    icon.source:  constant.groupchatIcon
+                    text: qsTr("视频通话")
+                }
+                MenuItem {
+                    icon.source: constant.groupchatIcon
+                    text: "文件"
+                    onClicked: {
+                        var component = Qt.createComponent("SendFile.qml");
+                        if(component.status === Component.Ready){
+                            var object=component.createObject(chatPage);
+                            //可以修改对方的值
+                            object.userId = s_userid;
+//                            console.log(s_userid)
+                        }
+                    }
+
+                }
+                MenuItem {
+                    icon.source: constant.groupchatIcon
+                    text: "相册"
                 }
             }
             Item { width: 5; height: 5 }
@@ -142,7 +181,7 @@ Page {
         target: message_listModel
         onRecv_mess:{
             chatListView.currentIndex = chatListView.count - 1;
-            //chat_listModel.add();   //在ChatsView 页面更新消息
+            chat_listModel.add();   //在ChatsView 页面更新消息
             //emit: data_changed();
 //            chat_listModel.setWord("true")
             console.log("message_listmodel!")
@@ -163,15 +202,25 @@ Page {
                 source: imagePathLeft
                 //source: constant.testPic
                 //opacity:  message_listModel.msgOpacity ? 1 : 0
-                visible: message_listModel.msgOpacity ? true : false
+//                visible: message_listModel.msgOpacity ? true : false
+                visible:  parseInt(msgOpacity) ? true : false;
             }
 
             Item {
                 id: chatContentAreaLeft
-                //opacity: message_listModel.msgOpacity? 1 : 0
-                visible: message_listModel.msgOpacity ? true : false
+                visible: parseInt(msgOpacity) ? true : false;
                 width: chatListView.chatContentAreaWidth
-                height: chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
+//                height: chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
+                height:
+                {
+                    if(chatContentTextLeft.contentHeight)
+                    {
+                        chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
+                    }else
+                    {
+                        70
+                    }
+                }
 
                 Rectangle {
                     id:chatRectangleLeft
@@ -182,6 +231,7 @@ Page {
                     height: parent.height
                     color: "green"
                     width: chatContentTextLeft.contentWidth > 200 ? chatContentTextLeft.contentWidth : 200
+                    visible:  parseInt(type)===0 ? true : false
                     Text {
                         id: chatContentTextLeft
 
@@ -199,6 +249,42 @@ Page {
                         font.family: "微软雅黑"
                     }
                 }
+
+                Rectangle{
+                    id:chatFileREctangleLeft
+                    border.width: 1
+                    border.color: "#ccc"
+                    anchors.left: parent.left
+                    height: 70
+                    color: "white"
+                    width: 250
+                    visible: parseInt(type)===1 ? true : false
+                    Image {
+                        id: imageLeft
+                        width: 40
+                        height: 40
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: constant.fileIcon
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    Label {
+                        id: labelLeft
+                        anchors.left: parent.left
+                        anchors.leftMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 133
+                        height: 45
+//                        text: filename //即这一行便为消息的内容
+                        text: content
+                        wrapMode: Text.WordWrap
+                        verticalAlignment: Text.AlignTop
+                        horizontalAlignment: Text.AlignLeft
+                    }
+
+                }
             }
 
             Image {
@@ -212,10 +298,22 @@ Page {
             }
             Item {
                 id: chatContentAreaRight
-                visible: message_listModel.msgOpacity ? false : true
+                visible: parseInt(msgOpacity) ? false : true;
+//                visible: message_listModel.msgOpacity ? false : true
                 //opacity:  message_listModel.msgOpacity ? 0 : 1
                 width: chatListView.chatContentAreaWidth
-                height: chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
+//                height: chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
+
+                height:
+                {
+                    if(chatContentTextRight.contentHeight)
+                    {
+                        chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
+                    }else
+                    {
+                        70
+                    }
+                }
 
                 Rectangle {
                     id:chatRectangleRight
@@ -226,6 +324,7 @@ Page {
                     height: parent.height
                     color: "green"
                     width: chatContentTextRight.contentWidth > 200 ? chatContentTextRight.contentWidth : 200
+                    visible: parseInt(type)===0 ? true : false
                     Text {
                         id: chatContentTextRight
 
@@ -244,6 +343,42 @@ Page {
                     }
                 }
 
+                Rectangle{
+                    id:chatFileREctangleRight
+                    border.width: 1
+                    border.color: "#ccc"
+                    anchors.right: parent.right
+                    height: 70
+                    color: "white"
+                    width: 250
+                    visible: parseInt(type)===1 ? true : false
+                    Image {
+                        id: image
+                        width: 40
+                        height: 40
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: constant.fileIcon
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    Label {
+                        id: label
+                        anchors.left: parent.left
+                        anchors.leftMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 133
+                        height: 45
+//                        text: filename //即这一行便为消息的内容
+                        text: content
+                        wrapMode: Text.WordWrap
+                        verticalAlignment: Text.AlignTop
+                        horizontalAlignment: Text.AlignLeft
+                    }
+
+                }
+
             }
 
         Image {
@@ -255,7 +390,7 @@ Page {
             source: imagePathRight
            // source: constant.testPic
             //opacity: message_listModel.msgOpacity ? 0 : 1
-            visible: message_listModel.msgOpacity ? false : true
+            visible: parseInt(msgOpacity) ? false : true;
         }
         }
     }

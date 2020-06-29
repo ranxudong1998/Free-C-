@@ -30,7 +30,7 @@ FC_Display::FC_Display(FC_Client* client,FC_Profile* profile)
     //_profile = new FC_Profile (client);
     _buddy = Buddy::getInstance();
     this->_chat_listModel = new FC_Chat_ListModel();
-   this->_list_model = new FC_Message_ListModel(_client,_chat_listModel);
+    this->_list_model = new FC_Message_ListModel(_client,_chat_listModel);
 
 
 }
@@ -53,21 +53,65 @@ void FC_Display::recv_group_msg(std::vector<std::string> vs)
 {
     std::cout <<"count打印测试"<<vs.at(2);
     this->_list_model->recv_group({QString::fromStdString(vs.at(0)),
-                             QString::fromStdString(vs.at(1)),    //消息接受这ID
-                             QString::fromStdString("."),
-                             QString::fromStdString(vs.at(2))});
+                                   QString::fromStdString(vs.at(1)),    //消息接受这ID
+                                   QString::fromStdString("."),
+                                   QString::fromStdString(vs.at(2))});
 }
 void FC_Display::recv(std::vector<std::string> vs){//display receive message
     std::cout <<"count打印测试"<<vs.at(2);
     this->_list_model->recv({QString::fromStdString(vs.at(0)),    //好友id
                              QString::fromStdString(vs.at(1)),    //消息接受这ID,也就是当前客户id
                              QString::fromStdString("."),
-                             QString::fromStdString(vs.at(2))});    //消息
+                             QString::fromStdString(vs.at(2)),   //消息
+                             QString::fromStdString(vs.at(3))}); //type
+//    this->_list_model->recv({QString::fromStdString(vs.at(0)),    //好友id
+//                             QString::fromStdString(vs.at(1)),    //消息接受这ID,也就是当前客户id
+//                             QString::fromStdString("."),
+//                             QString::fromStdString(vs.at(2))});    //消息
 
     cout<<"_list_recv_model:"<<vs.at(0)<<"  :   "<<vs.at(1)<<endl;
 
-//    this->_chat_listModel->add({QString::fromStdString(vs.at(0)),
-//                                 QString::fromStdString(vs.at(2))});
+    //    this->_chat_listModel->add({QString::fromStdString(vs.at(0)),
+    //                                 QString::fromStdString(vs.at(2))});
+}
+
+void FC_Display::recv_history(FC_Message *msg)
+{
+    string tmpHistory = msg->body();
+    qDebug() <<"json 打印:"<< msg->body();
+    Json::Value root;
+    Json::Reader reader;
+
+    if (reader.parse(tmpHistory, root))
+    {
+        //读取数组信息
+        cout << "Here's history:" << endl;
+        for (unsigned int i = 0; i < root.size(); i++)
+        {
+            string tmpContent = root[i].asString();
+            const char* tmp = tmpContent.c_str();
+            char* w_account = new char[7];
+            memset(w_account,'\0',7);
+            char* m_account =new char[7];
+            memset(m_account,'\0',6);
+            memcpy(w_account,tmp,FC_ACC_LEN);
+            memcpy(m_account,tmp+6,FC_ACC_LEN);
+            const char *content = tmp+12;  //消息内容
+
+//            this->_list_model->handle_history({QString::fromStdString(w_account),
+//                                               QString::fromStdString(m_account),    //消息接受这ID
+//                                               QString::fromStdString("."),
+//                                               QString::fromStdString(content)});
+
+        }
+
+        cout << "Reading Complete!" << endl;
+    }
+    else
+    {
+        cout << "parse error\n" << endl;
+    }
+
 }
 void FC_Display::show(){
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -86,6 +130,6 @@ void FC_Display::show(){
     _engine->rootContext()->setContextProperty("chat_listModel",this->_chat_listModel);
     this->_engine->rootContext()->setContextProperty("message_listModel",this->_list_model);
     this->_engine->load(QUrl(QStringLiteral("qrc:/qml/Fc_MainWindow.qml")));
-//    this->_engine->load(QUrl(QStringLiteral("qrc:/Login.qml")));
+    //    this->_engine->load(QUrl(QStringLiteral("qrc:/Login.qml")));
     this->_app_ui->exec();
 }

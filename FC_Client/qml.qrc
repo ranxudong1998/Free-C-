@@ -152,5 +152,9 @@
         <file>qml/BussinessPage/Contact/NewFriendsPage.qml</file>
         <file>qml/resource/background/active/chat-bubble1.png</file>
         <file>qml/BussinessPage/Contact/GroupList.qml</file>
+        <file>qml/resource/icons/label-icons/ellipsis.png</file>
+        <file>qml/resource/icons/label-icons/fileIcon.png</file>
+        <file>qml/BussinessPage/Chat/SendFile.qml</file>
+        <file>qml/resource/icons/label-icons/return.png</file>
     </qresource>
 </RCC>

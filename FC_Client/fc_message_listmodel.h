@@ -21,7 +21,9 @@ public:
 
      MsgVector::iterator handle_recv_msg(QVector<QString> content);
      MsgVector::iterator handle_own_msg(QVector<QString> content);
-//     MsgVector::iterator handle_recv_group_msg(QVector<QString> content);
+     void handle_history(QVector<QString> mess);
+
+     //     MsgVector::iterator handle_recv_group_msg(QVector<QString> content);
 //     MsgVector::iterator handle_own_group_msg(QVector<QString> content);
      void add_msg_to_socket(QVector<QString> content);
      QString get_head_path(QString id);
@@ -39,6 +41,7 @@ public:
     bool msgOpacity() const;
     bool set_msgOpacity(bool tmp);
 
+    Q_INVOKABLE void send_file(const QString& acc,const QString& filename);
     Q_INVOKABLE void add(QVector<QString> mess);// display to socket
     Q_INVOKABLE void recv(QVector<QString> content);// socket to display
     Q_INVOKABLE void recv_group(QVector<QString> content);// socket to display
@@ -59,6 +62,7 @@ private:
     FC_Chat_ListModel* _chat_listModel;
     MsgVector _all_mess;   //存储所有的消息 <消息发送者id,对行id的所有消息>
     QString _currentChatId;  //当前聊天对象Id
+    QString _m_id;
     bool _msgOpacity;           //设置消息的左右显示,0表示右边显示,1表示左边显示
 
 

@@ -9,7 +9,11 @@
 #include "fc_friends_handle.h"
 #include "fc_buddy.h"
 #include "fc_profile_handle.h"
+#include "fc_base64decrypt.h"
 #include <iostream>
+#include <zlib.h>
+#include <iostream>
+#include <fstream>
 
 namespace fs = std::filesystem;
 using namespace std;
@@ -51,6 +55,10 @@ void FC_Message_Handle::handle_body(FC_Message* message){
         case FC_UPDATE_SEX:
             //            _client->update_gender(message->body());
             _profile->update_gender(message->body());
+            break;
+
+        case FC_UPDATE_HEAD:
+            _profile->update_heading(message->body());
             break;
         default:
             cout<<"没有这样的类型"<<endl;
@@ -97,6 +105,14 @@ void FC_Message_Handle::handle_body(FC_Message* message){
         case FC_GROUP_TEXT_MEG:
             handle_group_text_msg(message);
             break;
+        case FC_TEXT_MEG_HISTORY:
+            handle_history(message);
+            break;
+        case FC_FILE_MEG:
+            handle_file_text_msg(message);
+            break;
+        default:
+            cout<<"没有这个类型"<<endl;
         }
 
     }else{
@@ -106,6 +122,8 @@ void FC_Message_Handle::handle_body(FC_Message* message){
 
 
 void FC_Message_Handle::handle_text_msg(FC_Message* msg){
+
+//      qDebug() <<"text message 打印:"<<msg->body();
     char* w_account = new char[7];
     memset(w_account,'\0',7);
     char* m_account =new char[7];
@@ -113,11 +131,13 @@ void FC_Message_Handle::handle_text_msg(FC_Message* msg){
     memcpy(w_account,msg->header()+sizeof (unsigned)*2,FC_ACC_LEN);
     memcpy(m_account,msg->header()+14,FC_ACC_LEN);
     char *content = msg->body()+12;  //消息内容
-    std::vector<std::string> vs(3);
+//    std::vector<std::string> vs(3);  //message type
+    std::vector<std::string> vs(4);  //message type
     qDebug()<<"w_account: "<< w_account;
     vs.at(0)=w_account;   //消息发送者id
     vs.at(1)=m_account;   //消息接收者id
     vs.at(2)=content;     //消息内容
+    vs.at(3) = "0";       //消息type
     this->_client->add_msg_to_display(vs);
     free(w_account);
     free(m_account);
@@ -141,6 +161,65 @@ handle_group_text_msg(FC_Message *msg)
     this->_client->add_group_msg_to_display(vs);
     free(w_account);
     free(m_account);
+}
+
+void FC_Message_Handle::handle_history(FC_Message *message)
+{
+    this->_client->add_history_to_display(message);
+    qDebug() <<"json message 打印:"<<message->body();
+}
+
+void FC_Message_Handle::handle_file_text_msg(FC_Message *msg)
+{
+    //save current path
+    Json::Value root;
+    Json::Reader reader;
+    if(!reader.parse(msg->get_core_body(), root)){
+        std::cout <<"failed" <<std::endl;
+        exit(0);
+    }
+    string name = root["name"].asString();
+    int length = root["length"].asInt();
+    string content1 = root["content"].asString();
+
+    Base64Decrypt decrypt(content1.c_str(),content1.size()); //解码
+    uLong srcL = decrypt.GetSize();
+    char* destV = new char[length];
+    uLong destL;
+    string value = decrypt.GetString();
+    int error = uncompress((Bytef *)destV, &destL, (Bytef *)value.c_str(), srcL);
+    if(error == Z_MEM_ERROR)
+    {
+        printf("compress failed! memoey error\n");
+        exit(0);
+    }else if(error == Z_DATA_ERROR)
+    {
+        printf("compress failed! data error\n");
+        exit(0);
+    }else if(error == Z_BUF_ERROR)
+    {
+        printf("compress failed! buf error\n");
+        exit(0);
+    }
+
+    std::ofstream fout("zhouyi.txt", std::ios::binary);
+    if(!fout)
+    {
+        std::cout<<"open failed";
+        exit(0);
+    }
+    fout.write(destV, destL);
+    fout.close();
+    delete []destV;
+
+    cout<<"msg->get_self_identify():"<<msg->get_self_identify()<<endl;
+    cout<<"msg->get_friends_identify():"<<msg->get_friends_identify()<<endl;
+    std::vector<std::string> vs(4);
+    vs.at(0) = msg->get_self_identify(); //消息发送者id
+    vs.at(1) = msg->get_friends_identify(); //消息接收者id
+    vs.at(2) = name;
+    vs.at(3) = "1";
+    this->_client->add_msg_to_display(vs);
 }
 const char* FC_Message_Handle::text_body(const char* content){
     int n = strlen(content)+1;

@@ -14,6 +14,7 @@ class Buddy;
 class  FC_Message_ListModel;
 class FC_Friends_Handle;
 class FC_Chat_ListModel;
+class FC_Message;
 
 class FC_Display
 {
@@ -26,6 +27,7 @@ public:
     void recv(QString s); //display receive message
     void recv_group_msg(std::vector<std::string> vs);
     void recv(std::vector<std::string> vs); //display receive message
+    void recv_history(FC_Message* msg);
 
 private:
     FC_Client* _client = nullptr;

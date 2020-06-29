@@ -113,6 +113,32 @@ void FC_Profile::updateGender(const QString &sex)
     _client->add_msg_to_socket(message);
 }
 
+void FC_Profile::updateHeading(const QString &filepath)
+{
+    //里面存放信息 用户标识，头像信息（目的是为了更新库）
+    string content = _client->handle_user_head(filepath.toStdString());
+
+    std::cout << "content length" << content.size()<<std::endl;
+//    _client->save_user_head("zhouyi",content);
+    ptree writeroot;
+    writeroot.put("account",_client->getUniqueUserName());
+    writeroot.put("heading",content);
+    std::stringstream ss;
+    boost::property_tree::write_json(ss,writeroot);
+
+    string contents = ss.str();
+
+
+    FC_Message* msg = new FC_Message;
+    msg->set_message_type(FC_UPDATE_HEAD);
+    msg->set_body_length(contents.size());
+    msg->set_body(contents.c_str(),contents.size());
+//    msg->set_body(ss.str().c_str(),ss.str().size());
+
+    std::cout<<"contents "<<contents.size()<<std::endl;
+    _client->add_msg_to_socket(msg);
+}
+
 void FC_Profile::update_nick(const QString &nick)
 {
     this->_profile->setNickname(nick);
@@ -121,6 +147,39 @@ void FC_Profile::update_nick(const QString &nick)
 void FC_Profile::update_gender(const QString &sex)
 {
     this->_profile->setGender(sex);
+}
+
+void FC_Profile::update_heading(const char *msg)
+{
+    Json::Value root;
+    Json::Reader reader;
+    string acc;
+    string head;
+    if(!reader.parse(msg,root))
+    {
+        std::cout <<"failed" <<std::endl;
+    }else
+    {
+        head= root["heading"].asString();
+        acc = root["account"].asString();
+
+    }
+    acc = acc+"1"; //不能是相同的值
+    std::cout<<"acc:"<<head.size()<<std::endl;
+    if(_client->save_user_head(acc,head)){
+        fs::path p = fs::current_path(); //目的是为了得到相对路径
+
+        string path = "file://"+p.string()+"/assert/"+acc+".jpg";
+    //    std::cout<<path<<std::endl;
+
+        QString heading = QString::fromLocal8Bit(path.c_str());
+
+
+//        QString heading ="file:///run/media/root/linux_data/FC_IM/build-FC_Client_ran-Desktop_Qt_5_14_0_GCC_64bit-Debug/assert/@12345.jpg";
+        qDebug()<<heading;
+        this->_profile->setHeading(heading);
+    }
+
 }
 
 void FC_Profile::parser_json(const std::string &content)

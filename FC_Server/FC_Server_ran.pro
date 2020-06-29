@@ -10,6 +10,8 @@ INCLUDEPATH += .
 QT += quick sql
 #LIBS +=/usr/local/include/boost_1_72_0/stage/lib/libboost_thread.a
 LIBS +=/usr/lib/libboost_thread.a
+include(json/json.pri)
+
 
 # You can make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -29,6 +31,7 @@ HEADERS += fc_acceptor.h \
            fc_message_handle.h \
            fc_server.h \
            fc_thread_pool.h
+
 SOURCES += fc_acceptor.cpp \
            fc_connection.cpp \
            fc_database.cpp \
@@ -39,3 +42,4 @@ SOURCES += fc_acceptor.cpp \
            fc_server.cpp \
            fc_thread_pool.cpp \
            main.cpp
+

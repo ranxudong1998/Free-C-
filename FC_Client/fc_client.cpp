@@ -13,6 +13,7 @@
 #include <iostream>
 
 namespace fs = std::filesystem;
+using namespace std;
 
 using namespace boost::property_tree;
 //==============================================
@@ -65,6 +66,11 @@ void FC_Client::add_group_msg_to_display(std::vector<std::string> msg)
     this->_display->recv_group_msg(msg);
 }
 
+void FC_Client::add_history_to_display(FC_Message *msg)
+{
+    this->_display->recv_history(msg);
+}
+
 
 void FC_Client::setUniqueUserName(string name)
 {
@@ -92,7 +98,7 @@ void FC_Client::forward_message(FC_Message *msg)
 
 }
 
-void FC_Client::save_user_head(const string &acc,const string& heading)
+bool FC_Client::save_user_head(const string &acc,const string& heading)
 {
     //保存在配置文件中
 
@@ -102,10 +108,36 @@ void FC_Client::save_user_head(const string &acc,const string& heading)
     if(!fout)
     {
         std::cout<<"open failed";
-        exit(0);
+        return false;
+//        exit(0);
     }
     fout.write(heading.data(), heading.size());
     fout.close();
+    return true;
+}
+
+std::string FC_Client::handle_user_head(const std::string &filepath)
+{
+    // 1. 打开图片文件
+    ifstream is(filepath, ifstream::in | ios::binary);
+
+    if(!is.is_open())
+    {
+        cout<<"open failed"<<endl;
+        exit(0);
+    }
+    // 2. 计算图片长度
+    is.seekg(0, is.end);
+    int length = is.tellg();
+    is.seekg(0, is.beg);
+    // 3. 创建内存缓存区
+    char * buffer = new char[length];
+    // 4. 读取图片
+    is.read(buffer, length);
+    string content(buffer,length);
+    is.close();
+    delete [] buffer;
+    return content;
 }
 
 std::unordered_map<std::string, BuddyItem *> &FC_Client::get_item()

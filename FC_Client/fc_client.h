@@ -34,7 +34,7 @@ public:
     void add_msg_to_display(std::vector<std::string> msg); //socket message to display
     void add_msg_to_socket(std::vector<std::string> msg); //display message to socket
     void add_group_msg_to_display(std::vector<std::string> msg);
-
+    void add_history_to_display(FC_Message* msg);
     //profile about
     //set funcation
     void setUniqueUserName(std::string name);
@@ -42,7 +42,9 @@ public:
     std::string getUniqueUserName();
 
     void forward_message(FC_Message* msg);
-    void save_user_head(const std::string& acc,const string& heading);
+    bool save_user_head(const std::string& acc,const string& heading);
+    string handle_user_head(const string& filepath); //所有需要发送图片都可以调用这个接口
+
 
     std::unordered_map<string,BuddyItem*>& get_item();
     void set_item(string& acc,BuddyItem* item);
@@ -54,7 +56,7 @@ private:
     FC_Message_Handle* _message_handle; //handle message
 
     std::string uniqueUserName; //现在用户模块单出来了 可以单独使用;
-    std::unordered_map<string,BuddyItem*> _items;
+    std::unordered_map<string,BuddyItem*> _items; //存放所有的好友信息
 };
 
 #endif // FC_CLIENT_H

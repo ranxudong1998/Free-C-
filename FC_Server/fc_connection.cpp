@@ -33,7 +33,9 @@ void FC_Connection::read(){
     read_header();
 }
 void FC_Connection::write(FC_Message* message){
+   // qDebug() <<"json message 打印:"<<message->body();
     unsigned len = message->mess_length();
+
     try {
         async_write(*this->_sock,buffer(message->header(),len),boost::bind(&FC_Connection::on_wirte,this,message,_1));
     } catch (boost::system::system_error e) {

@@ -13,6 +13,7 @@ CONFIG -= app_bundle
 include(json/json.pri)
 
 LIBS +=/usr/lib/libboost_thread.a
+LIBS += /usr/lib/libz.a
 DEFINES += QT_DEPRECATED_WARNINGS
 # You can make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -23,6 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # Input
 HEADERS += fc_buddy.h \
+           fc_base64decrypt.h \
+           fc_base64encrypt.h \
            fc_buddyitem.h \
            fc_buddymodel.h \
            fc_buddyteam.h \

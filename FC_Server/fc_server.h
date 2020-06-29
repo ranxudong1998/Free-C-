@@ -50,6 +50,7 @@ public:
 
     void init_accounts();
     bool login_verify(const string& acc,const string& pass);
+    bool  repeat_login(const string& acc,FC_Connection* con);
     bool update_nick(const string& acc,const string& nick);
     bool update_gender(const string& acc,const string& sex);
 

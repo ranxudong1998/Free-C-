@@ -37,6 +37,8 @@ public:
     void set_body_length(unsigned body_len);
     void set_message_type(unsigned type);
     void set_body(const char* data,unsigned len);
+    void set_header(unsigned type,unsigned int body_len);
+
 
     //set new data package design
     void set_friend_identify(const char* data);

@@ -34,7 +34,11 @@ void ProfileMsg::setHeading(const QString &heading)
 {
     if( m_heading != heading)
     {
+//        m_heading = "";
         m_heading = heading;
+        emit headingChanged();
+    }else
+    {
         emit headingChanged();
     }
 }

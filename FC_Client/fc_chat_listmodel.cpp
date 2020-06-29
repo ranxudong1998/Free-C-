@@ -58,7 +58,6 @@ void FC_Chat_ListModel::add(){
         _all_last_msg.insert(this->_one_last_msg.at(0),this->get_last_msg());
     }else {
         iter.value() =this->get_last_msg();
-        qDebug()<<"fjsdafsoai";
     }
 
     LastMsgVector::iterator tmpIter = this->_all_last_msg.begin();

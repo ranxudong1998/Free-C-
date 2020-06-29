@@ -41,7 +41,7 @@ Page {
 
       // email text and field
       Text {
-        text: qsTr("E-mail")
+        text: qsTr("帐号")
         font.pixelSize: 12
       }
 
@@ -53,7 +53,7 @@ Page {
 
       // password text and field
       Text {
-        text: qsTr("Password")
+        text: qsTr("密码")
         font.pixelSize: 12
       }
 
@@ -89,9 +89,7 @@ Page {
           flat: true
           anchors.horizontalCenter: parent.horizontalCenter
           onClicked: {
-            var component = Qt.createComponent("Register.qml");
-            component.createObject(loginPage);
-            console.debug("registering...")
+              __PushPage(Qt.resolvedUrl("./FC_Register.qml"), {} );
           }
         }
       }

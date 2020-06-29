@@ -7,6 +7,7 @@
 #include <iostream>
 #include <QDebug>
 #include <QSqlQuery>
+#include <algorithm>
 //==============================================
 //  public function
 //==============================================
@@ -113,10 +114,21 @@ void FC_Server::init_accounts()
 
 bool FC_Server::login_verify(const string &acc, const string &pass)
 {
+    //查看密码是否正确 同时查看这个帐号是否登录过
     if(_accounts[acc] == pass)
         return true;
     return false;
 }
+
+bool FC_Server::repeat_login(const std::string &acc, FC_Connection *con)
+{
+    if(_onlineP.count(acc))
+        return false;
+    else
+        return true;
+}
+
+
 
 void FC_Server::set_accounts(const string &acc, const string &pass)
 {
