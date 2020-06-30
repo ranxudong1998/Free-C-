@@ -139,6 +139,11 @@ void FC_Profile::updateHeading(const QString &filepath)
     _client->add_msg_to_socket(msg);
 }
 
+void FC_Profile::registers(const QString &acc, const QString &pass)
+{
+
+}
+
 void FC_Profile::update_nick(const QString &nick)
 {
     this->_profile->setNickname(nick);

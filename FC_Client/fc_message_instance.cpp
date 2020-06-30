@@ -15,7 +15,7 @@ FC_Message_Instance::FC_Message_Instance(FC_Client* client):_client(client)
     this->_roles.insert(i++,"s_id");
     this->_roles.insert(i++,"time");
     this->_roles.insert(i++,"content");
-    this->_roles.insert(i++,"type");            //消息类型
+    this->_roles.insert(i++,"type");            //消息类型,0:文本消息;1文件消息;2:图片消息
     this->_roles.insert(i++,"imagePathLeft");
     this->_roles.insert(i++,"imagePathRight"); //存一个头像值就行
     this->_roles.insert(i++,"msgOpacity"); //判断当前显示的位置

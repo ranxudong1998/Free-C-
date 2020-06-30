@@ -77,6 +77,7 @@ QString ProfileMsg::sign() const
     return m_sign;
 }
 
+
 ProfileMsg::ProfileMsg(QObject *parent)
     :QObject(parent)
 {

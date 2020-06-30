@@ -182,8 +182,6 @@ Page {
         onRecv_mess:{
             chatListView.currentIndex = chatListView.count - 1;
             chat_listModel.add();   //在ChatsView 页面更新消息
-            //emit: data_changed();
-//            chat_listModel.setWord("true")
             console.log("message_listmodel!")
         }
     }
@@ -200,9 +198,6 @@ Page {
                 height: chatListView.headPortraitPictureWidth
                 sourceSize: Qt.size(width, height)
                 source: imagePathLeft
-                //source: constant.testPic
-                //opacity:  message_listModel.msgOpacity ? 1 : 0
-//                visible: message_listModel.msgOpacity ? true : false
                 visible:  parseInt(msgOpacity) ? true : false;
             }
 
@@ -210,7 +205,6 @@ Page {
                 id: chatContentAreaLeft
                 visible: parseInt(msgOpacity) ? true : false;
                 width: chatListView.chatContentAreaWidth
-//                height: chatContentTextLeft.contentHeight > 60 ? chatContentTextLeft.contentHeight : 60
                 height:
                 {
                     if(chatContentTextLeft.contentHeight)
@@ -240,7 +234,7 @@ Page {
                         anchors.leftMargin: chatListView.itemSpacing
                         anchors.top: parent.top
                         anchors.topMargin: chatListView.itemSpacing
-                        // anchors.centerIn: parent
+
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignLeft
@@ -299,11 +293,7 @@ Page {
             Item {
                 id: chatContentAreaRight
                 visible: parseInt(msgOpacity) ? false : true;
-//                visible: message_listModel.msgOpacity ? false : true
-                //opacity:  message_listModel.msgOpacity ? 0 : 1
                 width: chatListView.chatContentAreaWidth
-//                height: chatContentTextRight.contentHeight > 60 ? chatContentTextRight.contentHeight : 60
-
                 height:
                 {
                     if(chatContentTextRight.contentHeight)
@@ -388,8 +378,6 @@ Page {
             height: chatListView.headPortraitPictureWidth
             sourceSize: Qt.size(width, height)
             source: imagePathRight
-           // source: constant.testPic
-            //opacity: message_listModel.msgOpacity ? 0 : 1
             visible: parseInt(msgOpacity) ? false : true;
         }
         }

@@ -5,6 +5,7 @@
 #include "fc_chat_listmodel.h"
 #include "fc_base64encrypt.h"
 #include "fc_message.h"
+#include "fc_profile.h"
 #include <QDebug>
 #include <fstream>
 #include <filesystem>
@@ -21,8 +22,8 @@ using namespace std;
 //==============================================
 
 
-FC_Message_ListModel::FC_Message_ListModel(FC_Client*client,FC_Chat_ListModel* chat_list_model, QObject* parent)
-    :QAbstractListModel(parent),_client(client),_chat_listModel(chat_list_model)
+FC_Message_ListModel::FC_Message_ListModel(FC_Client*client,FC_Chat_ListModel* chat_list_model,ProfileMsg* profile, QObject* parent)
+    :QAbstractListModel(parent),_client(client),_chat_listModel(chat_list_model),_profile(profile)
 {
 
     _instace = new FC_Message_Instance(_client);
@@ -51,9 +52,11 @@ MsgVector::iterator FC_Message_ListModel::handle_own_msg(QVector<QString> conten
 
 void FC_Message_ListModel::handle_history(QVector<QString> content)
 {
-    if(content.at(1) ==  this->_m_id){
+    if(content.at(0) == this->_profile->account()){
+        this->_is_history=false;
         add(content);
     }else {
+        this->_is_history=false;
         recv(content);
     }
 }
@@ -99,9 +102,9 @@ QHash<int, QByteArray> FC_Message_ListModel::roleNames() const{
 
 //transfer function
 void FC_Message_ListModel::add(QVector<QString> content){// display to socket
-    if(content.at(4).toInt() == 0) //text content
+    if((content.at(4).toInt()) == 0 && (this->_is_history ==true)) //text content
         add_msg_to_socket(content); //传送给了服务端
-    else if(content.at(4).toInt() == 1) //file content
+    else if(content.at(4).toInt() == 1) //file content  ,2是图片消息
     {
         send_file(content.at(1),content.at(5));
         content.removeLast();
@@ -109,6 +112,7 @@ void FC_Message_ListModel::add(QVector<QString> content){// display to socket
 
     QString tmpPathLeft= get_head_path(content.at(1));
     QString tmpPathRight = get_head_path(content.at(0));
+
     content.push_back(tmpPathLeft);         //添加对应头像路径
     content.push_back(tmpPathRight);
     content.push_back("0"); //设置可见还是不可见
@@ -121,12 +125,14 @@ void FC_Message_ListModel::add(QVector<QString> content){// display to socket
     this->_instace->add(content);
     endInsertRows();
     emit recv_mess();
+    this->_is_history=true;
 }
 void FC_Message_ListModel::recv(QVector<QString> content){// socket to display
     //添加对应头像路径
     //这里也可以直接调用 好友列表的接口，不需要自己重新获取头像路径
     QString tmpPathLeft= get_head_path(content.at(0));
     QString tmpPathRight = get_head_path(content.at(1));
+
     content.push_back(tmpPathLeft);
     content.push_back(tmpPathRight);
     content.push_back("1");
@@ -141,13 +147,22 @@ void FC_Message_ListModel::recv(QVector<QString> content){// socket to display
     this->_instace->recv(content);
     endInsertRows();
     emit recv_mess();
+    this->_is_history=true;
 }
 
 void FC_Message_ListModel::recv_group(QVector<QString> content)
 {
     handle_own_msg(content);
-    //this->_chat_listModel->handle_last_msg({content.at(0),content.at(3)});
+//    this->_chat_listModel->set_last_msg({content.at(0),content.at(3),content.at(5)});
+    QString tmpPathLeft= get_head_path(content.at(0));
+    QString tmpPathRight = get_head_path(_profile->account());
+    content.push_back(tmpPathLeft);
+    content.push_back(tmpPathRight);
+    content.push_back("1");
+    handle_recv_msg(content);
+//    this->_chat_listModel->set_last_msg({content.at(0),content.at(3),content.at(5)});
     //检测是否为当前聊天信息
+
     if(content.at(1) !=this->currentChatId()){
         return;
     }
@@ -167,7 +182,6 @@ void FC_Message_ListModel::loadMsg(QString key)
     qDebug()<<"load key data: "<<key;
     MsgVector:: iterator iter =this->_all_mess.find(key);
     for(int i = 0; i < iter->length();i++){
-
         //消息直接在UI上打印
         if(iter.value().at(i).at(0) == key){
             set_msgOpacity(true);

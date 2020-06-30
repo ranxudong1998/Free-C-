@@ -8,6 +8,7 @@ class FC_Message_Instance;
 class FC_Client;
 class FC_instance_handle;
 class FC_Chat_ListModel;
+class ProfileMsg;
 
 
 typedef QHash<QString, QVector<QVector<QString>>> MsgVector;
@@ -16,17 +17,17 @@ class FC_Message_ListModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    FC_Message_ListModel(FC_Client*client,FC_Chat_ListModel* chat_list_model, QObject* parent=nullptr);
+    FC_Message_ListModel(FC_Client*client,FC_Chat_ListModel* chat_list_model,ProfileMsg* profile, QObject* parent=nullptr);
     ~FC_Message_ListModel();
 
-     MsgVector::iterator handle_recv_msg(QVector<QString> content);
-     MsgVector::iterator handle_own_msg(QVector<QString> content);
-     void handle_history(QVector<QString> mess);
+    MsgVector::iterator handle_recv_msg(QVector<QString> content);
+    MsgVector::iterator handle_own_msg(QVector<QString> content);
+    void handle_history(QVector<QString> mess);
 
-     //     MsgVector::iterator handle_recv_group_msg(QVector<QString> content);
-//     MsgVector::iterator handle_own_group_msg(QVector<QString> content);
-     void add_msg_to_socket(QVector<QString> content);
-     QString get_head_path(QString id);
+    //     MsgVector::iterator handle_recv_group_msg(QVector<QString> content);
+    //     MsgVector::iterator handle_own_group_msg(QVector<QString> content);
+    void add_msg_to_socket(QVector<QString> content);
+    QString get_head_path(QString id);
 
     //override function
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; //index and role data
@@ -57,8 +58,10 @@ signals:
 
 
 private:
+    bool _is_history=true;
     FC_Client* _client = nullptr;
     FC_Message_Instance* _instace = nullptr;
+    ProfileMsg* _profile;
     FC_Chat_ListModel* _chat_listModel;
     MsgVector _all_mess;   //存储所有的消息 <消息发送者id,对行id的所有消息>
     QString _currentChatId;  //当前聊天对象Id

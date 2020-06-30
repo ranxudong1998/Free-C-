@@ -96,7 +96,7 @@ void FC_Message_Handle::handle_body(FC_Message* message){
             handle_text_msg(message);
             break;
         case FC_GROUP_TEXT_MEG:
-            handle_group_text_msg(message);
+           // handle_group_text_msg(message);
             break;
         case FC_FILE_MEG:
             //目前为直接转发，暂时不做存储
@@ -468,7 +468,7 @@ void FC_Message_Handle::handle_sign_in(const char* s){
         send_self_msg(account);
         send_friends_lists(account);
         handle_offlineM(account);
-        //send_history(account);
+        send_history(account);
     }else
     {
         std::cout<<"login failed"<<std::endl;
@@ -585,25 +585,57 @@ void FC_Message_Handle::store_history(FC_Message* msg,const string& path)
     memset(content,'\0',msg->body_length()+1);
     memcpy(content,msg->body(),msg->body_length());
 
-    //根节点
-    Json::Value root;
-    Json::Value msgContent;
-    //msgContent数组下,每个元素对应一条message
-    msgContent = content;
-    root.append(msgContent);
+    if(!is_file_exist(path)){
+        //根节点
+        Json::Value root;
+        //msgContent数组下,每个元素对应一条message
+        root["msgContent"].append(content);
 
-    //缩进输出
-    cout << "StyledWriter:" << endl;
-    Json::StyledWriter sw;
-    cout << sw.write(root) << endl << endl;
+        //缩进输出
+        cout << "StyledWriter:" << endl;
+        Json::FastWriter fw;
+        cout << fw.write(root) << endl << endl;
 
-    //输出到文件
-    ofstream os;
-    os.open(path, std::ios::out | std::ios::app);
-    if (!os.is_open())
-        cout << "error：can not find or create the json file" << endl;
-    os << sw.write(root);
-    os.close();
+        //输出到文件
+        ofstream os;
+        os.open(path, std::ios::out | std::ios::binary);
+        if (!os.is_open())
+            cout << "error：can not find or create the json file" << endl;
+        os << fw.write(root);
+        os.close();
+    }else{
+        Json::Reader reader;//读文件
+        Json::Value root;
+        //从文件中读取，保证当前文件有demo.json文件
+        ifstream infile(path, ios::binary);
+
+        if (!infile.is_open())
+        {
+            cout << "Error opening json file\n";
+            return;
+        }
+        ostringstream buf;
+        char ch;
+        while(buf &&infile.get(ch)){
+            buf.put(ch);
+        }
+        infile.close();
+        string tmpContent = buf.str();
+        if(reader.parse(tmpContent, root, false) == true){
+            root["msgContent"].append(content);
+        }
+
+        cout << "StyledWriter:" << endl;
+        Json::FastWriter fw;
+        cout << fw.write(root) << endl << endl;
+        //输出到文件
+        ofstream os;
+        os.open(path, std::ios::out | std::ios::binary);
+        if (!os.is_open())
+            cout << "error：can not find or create the json file" << endl;
+        os << fw.write(root);
+        os.close();
+    }
 }
 string FC_Message_Handle::get_file_path(FC_Message *msg)
 {
@@ -622,3 +654,10 @@ string FC_Message_Handle::get_file_path(FC_Message *msg)
     store_history(msg,filePath2);
 
 }
+
+//检验历史文件是否存在
+bool FC_Message_Handle::is_file_exist(const string &name)
+{
+    return (access( name.c_str(), F_OK ) != -1 );
+}
+

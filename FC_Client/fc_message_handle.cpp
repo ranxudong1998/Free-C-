@@ -153,11 +153,12 @@ handle_group_text_msg(FC_Message *msg)
     memcpy(w_account,msg->header()+sizeof (unsigned)*2,FC_ACC_LEN);
     memcpy(m_account,msg->header()+14,FC_ACC_LEN);
     char *content = msg->body()+12;  //消息内容
-    std::vector<std::string> vs(3);
-    qDebug()<<"群消息:"<< content;
+    std::vector<std::string> vs(4);
+    qDebug()<<"客户端群消息:"<< content;
     vs.at(0)=w_account;   //消息发送者id
     vs.at(1)=m_account;   //消息接收者id
     vs.at(2)=content;     //消息内容
+    vs.at(3) = "0";       //消息type
     this->_client->add_group_msg_to_display(vs);
     free(w_account);
     free(m_account);
