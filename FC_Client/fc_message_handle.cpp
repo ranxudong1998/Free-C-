@@ -44,6 +44,10 @@ void FC_Message_Handle::handle_body(FC_Message* message){
     //according message type handle message
     if(type&FC_PROFILE){
         switch (type) {
+        case FC_SIGN_IN_R:
+            cout<<"处理登录结果"<<endl;
+            _profile->handle_login(message->body());
+            break;
         case FC_SELF_MES:
             //            _client->json_data_parser_self(message->body());
             _profile->parser_json(message->body());
@@ -59,6 +63,10 @@ void FC_Message_Handle::handle_body(FC_Message* message){
 
         case FC_UPDATE_HEAD:
             _profile->update_heading(message->body());
+            break;
+        case FC_REGISTER_R:
+            cout<<"注册帐号： "<<message->body()<<endl;
+            _profile->handle_reguster(message->body());
             break;
         default:
             cout<<"没有这样的类型"<<endl;

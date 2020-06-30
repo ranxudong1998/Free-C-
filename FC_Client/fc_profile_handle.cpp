@@ -7,10 +7,13 @@
 #include <json/json.h>
 #include "fc_message.h"
 #include "fc_header.h"
+#include "fc_status.h"
 #include <QDebug>
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <random>
+
 namespace fs = std::filesystem;
 
 using namespace boost::property_tree;
@@ -119,7 +122,6 @@ void FC_Profile::updateHeading(const QString &filepath)
     string content = _client->handle_user_head(filepath.toStdString());
 
     std::cout << "content length" << content.size()<<std::endl;
-//    _client->save_user_head("zhouyi",content);
     ptree writeroot;
     writeroot.put("account",_client->getUniqueUserName());
     writeroot.put("heading",content);
@@ -133,7 +135,6 @@ void FC_Profile::updateHeading(const QString &filepath)
     msg->set_message_type(FC_UPDATE_HEAD);
     msg->set_body_length(contents.size());
     msg->set_body(contents.c_str(),contents.size());
-//    msg->set_body(ss.str().c_str(),ss.str().size());
 
     std::cout<<"contents "<<contents.size()<<std::endl;
     _client->add_msg_to_socket(msg);
@@ -141,6 +142,12 @@ void FC_Profile::updateHeading(const QString &filepath)
 
 void FC_Profile::registers(const QString &acc, const QString &pass)
 {
+    FC_Message* msg = new FC_Message;
+    msg->set_message_type(FC_REGISTER);
+    string content = acc.toStdString() + '\t' + pass.toStdString();
+    msg->set_body_length(content.size());
+    msg->set_body(content.c_str(),content.size());
+    _client->add_msg_to_socket(msg);
 
 }
 
@@ -169,22 +176,53 @@ void FC_Profile::update_heading(const char *msg)
         acc = root["account"].asString();
 
     }
-    acc = acc+"1"; //不能是相同的值
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> dis(1, 9);
+
+    string account;
+    for (int n=0; n<6; ++n)
+    {
+        int dice_roll = dis(gen);
+        account += std::to_string(dice_roll);
+    }
+
+    acc = account; //即时更新的问题
+    //不能是相同的值
+//    acc = acc +"1";//图片这里修改还有点问题
     std::cout<<"acc:"<<head.size()<<std::endl;
     if(_client->save_user_head(acc,head)){
         fs::path p = fs::current_path(); //目的是为了得到相对路径
 
         string path = "file://"+p.string()+"/assert/"+acc+".jpg";
-    //    std::cout<<path<<std::endl;
 
         QString heading = QString::fromLocal8Bit(path.c_str());
 
-
-//        QString heading ="file:///run/media/root/linux_data/FC_IM/build-FC_Client_ran-Desktop_Qt_5_14_0_GCC_64bit-Debug/assert/@12345.jpg";
-        qDebug()<<heading;
+        std::cout<<"acc acc:"<<head.size()<<std::endl;
         this->_profile->setHeading(heading);
     }
 
+}
+
+void FC_Profile::handle_login(const char *msg)
+{
+    if(strcmp(msg,"ok") == 0)
+    {
+        _client->set_status(FC_MessageStatus::LoginSucc);
+        std::cout<<"登录成功"<<msg<<std::endl;
+    }else
+    {
+        _client->set_status(FC_MessageStatus::LoginError);
+        std::cout<<"登录失败"<<std::endl;
+    }
+
+}
+
+void FC_Profile::handle_reguster(const char *msg)
+{
+    FC_MessageStatus* status = FC_MessageStatus::getInstance();
+    status->setAcc(msg);
+    status->setStatus(FC_MessageStatus::RegisterSucc);
 }
 
 void FC_Profile::parser_json(const std::string &content)

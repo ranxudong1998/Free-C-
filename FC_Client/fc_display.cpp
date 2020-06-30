@@ -29,6 +29,7 @@ FC_Display::FC_Display(FC_Client* client,FC_Profile* profile)
     _fhandle = new FC_Friends_Handle(client);
     //_profile = new FC_Profile (client);
     _buddy = Buddy::getInstance();
+    _status = FC_MessageStatus::getInstance();
     this->_chat_listModel = new FC_Chat_ListModel();
     this->_list_model = new FC_Message_ListModel(_client,_chat_listModel,_profilemsg);
 
@@ -124,6 +125,7 @@ void FC_Display::show(){
     _engine->rootContext()->setContextProperty("buddy",_buddy);
     _engine->rootContext()->setContextProperty("friends_handle",_fhandle);
     _engine->rootContext()->setContextProperty("chat_listModel",this->_chat_listModel);
+    _engine->rootContext()->setContextProperty("status_message",this->_status);
     this->_engine->rootContext()->setContextProperty("message_listModel",this->_list_model);
     this->_engine->load(QUrl(QStringLiteral("qrc:/qml/Fc_MainWindow.qml")));
     this->_app_ui->exec();

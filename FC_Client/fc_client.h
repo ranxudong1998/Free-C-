@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <json/json.h>
+#include "fc_status.h"
 
 using boost::thread;
 using std::string;
@@ -48,13 +49,14 @@ public:
 
     std::unordered_map<string,BuddyItem*>& get_item();
     void set_item(string& acc,BuddyItem* item);
+    void set_status(FC_MessageStatus::Status sta);
 private:
     FC_Connection* _connections = nullptr;//connect to server
     FC_Display* _display = nullptr;//user interface
     FC_Thread_Pool* _thread_pool = nullptr;
     FC_Profile* _profile = nullptr; //account information
     FC_Message_Handle* _message_handle; //handle message
-
+    FC_MessageStatus* _status;
     std::string uniqueUserName; //现在用户模块单出来了 可以单独使用;
     std::unordered_map<string,BuddyItem*> _items; //存放所有的好友信息
 };

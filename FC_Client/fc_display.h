@@ -15,6 +15,7 @@ class  FC_Message_ListModel;
 class FC_Friends_Handle;
 class FC_Chat_ListModel;
 class FC_Message;
+class FC_MessageStatus;
 
 class FC_Display
 {
@@ -38,6 +39,7 @@ private:
     FC_Chat_ListModel* _chat_listModel = nullptr;
     FC_Message_Handle* _handle = nullptr;
     FC_Friends_Handle* _fhandle =nullptr;
+    FC_MessageStatus* _status = nullptr;
     Buddy* _buddy = nullptr;
 
     QGuiApplication* _app_ui = nullptr;

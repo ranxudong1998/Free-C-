@@ -35,6 +35,9 @@ public:
     void update_nick(const QString& nick);
     void update_gender(const QString& sex);
     void update_heading(const char* msg);
+    void handle_login(const char* msg);
+    void handle_reguster(const char* msg);
+
     void parser_json(const std::string& content);
 signals:
     void selfMessage(const QString& acc,const QString& nick,const QString& sex);

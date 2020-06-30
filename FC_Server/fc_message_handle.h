@@ -52,8 +52,11 @@ public:
 private:
     void handle_ordinary_msg(FC_Message*);
     void handle_sign_in(const char* s);
+    void handle_register(FC_Message* msg);
     void handle_text_msg(FC_Message*);
     void handle_file_msg(FC_Message* msg);
+
+    string random_account();
 
 
     string handle_user_head(const string& filepath);

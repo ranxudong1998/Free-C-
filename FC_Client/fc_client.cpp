@@ -29,6 +29,7 @@ FC_Client::FC_Client()
     this->_message_handle = new FC_Message_Handle (this);
     this->_profile = new FC_Profile(this);
     this->_display = new FC_Display(this,_profile);
+    this->_status  = FC_MessageStatus::getInstance();
     this->_display->show(); //show ui
 }
 
@@ -150,6 +151,10 @@ void FC_Client::set_item(std::string &acc, BuddyItem *item)
     _items[acc] = item;
 }
 
+void FC_Client::set_status(FC_MessageStatus::Status sta)
+{
+    _status->setStatus(sta);
+}
 
 //==============================================
 //  private function

@@ -14,6 +14,7 @@
 #include <QSqlQuery>
 #include <json/json.h>
 #include "fc_db_proxy.h"
+#include <random>
 
 
 using namespace boost::property_tree;
@@ -50,6 +51,9 @@ void FC_Message_Handle::handle_body(FC_Message* message){
         case FC_UPDATE_HEAD:
             cout<<"修改头像"<<endl;
             update_heading(message);
+            break;
+        case FC_REGISTER :
+            handle_register(message);
             break;
         default:
             cout<<"没有这样的类型"<<endl;
@@ -464,6 +468,8 @@ void FC_Message_Handle::handle_sign_in(const char* s){
     qDebug()<<account<<":"<<password;
     if(_server->login_verify(account,password) && _server->repeat_login(account,_connection))
     {
+        FC_Message* msg = generate_message(FC_SIGN_IN_R,"ok");
+        _connection->write(msg);
         this->_server->add_identified(account,this->_connection); //添加在在线列表中
         send_self_msg(account);
         send_friends_lists(account);
@@ -471,10 +477,44 @@ void FC_Message_Handle::handle_sign_in(const char* s){
         send_history(account);
     }else
     {
-        std::cout<<"login failed"<<std::endl;
-        exit(0);
+        FC_Message* msg = generate_message(FC_SIGN_IN_R,"error");
+        _connection->write(msg);
     }
     //    qDebug() << s << "has singed in";
+}
+
+void FC_Message_Handle::handle_register(FC_Message *msg) //里面为昵称和密码
+{
+    string unique;
+    while(1)
+    {
+        unique = random_account();//生成随机帐号
+        if(_server->get_accounts().count(unique)==0)
+        {
+            FC_Message* message = generate_message(FC_REGISTER_R,unique.c_str());
+            _connection->write(message);
+            //分配帐号成功,返回给客户端
+            //存入信息在服务端
+            break;
+        }
+        //如果已经存在改帐号则继续分配
+    }
+    string nick;
+    string pass;
+    stringstream input(msg->body());
+    getline(input,nick,'\t');
+    getline(input,pass,'\t');
+    _server->set_accounts(unique,pass); //存入账户列表
+
+    QString nickname = QString::fromLocal8Bit(nick.c_str());
+    QString password = QString::fromLocal8Bit(pass.c_str());
+
+    DbBroker* broker = new DbBroker();
+    if(broker->add_user(nickname,password,QString::fromStdString(unique)))
+        cout<<"注册成功"<<endl;
+    else
+        cout<<"注册在数据库中失败"<<endl;
+
 }
 void FC_Message_Handle::send_history(const string &userId)
 {
@@ -519,6 +559,21 @@ void FC_Message_Handle::handle_file_msg(FC_Message *msg)
     _server->forward_message(msg->get_friends_identify(),msg);
 }
 
+//随机生成6位帐号信息
+string FC_Message_Handle::random_account()
+{
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> dis(1, 9);
+
+    string account;
+    for (int n=0; n<6; ++n)
+    {
+        int dice_roll = dis(gen);
+        account += std::to_string(dice_roll);
+    }
+    return account;
+}
 void FC_Message_Handle::handle_group_text_msg(FC_Message *msg)
 {
 

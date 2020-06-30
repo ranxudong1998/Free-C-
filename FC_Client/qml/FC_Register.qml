@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.2
+import QtQuick.Dialogs 1.1
 import "./Component"
 
 Page {
@@ -95,14 +96,30 @@ Page {
           anchors.horizontalCenter: parent.horizontalCenter
           onClicked: {
               console.log(txtUsername.text,txtPassword.text)
-//              if(user.insertMessage(txtUsername.text,txtPassword.text))
-              //              {
-              //                  var component = Qt.createComponent("Login.qml");
-              //                  component.createObject(registerPage);
-              //              }
+              profile_handle.registers(txtUsername.text,txtPassword.text)
           }
         }
       }
+    }
+
+    Connections{
+        target: status_message
+        onStatusChanged:{
+            console.log("状态发生改变")
+            if(status_message.status === 2)
+            {
+                messageDialog.open()
+                txtUsername.text=""
+                txtPassword.text=""
+            }
+        }
+    }
+    MessageDialog {
+        id: messageDialog
+        title: "注册成功"
+        text: "你的帐号为:"+status_message.acc
+        standardButtons: StandardButton.Yes
+        onYes: { try { stackView.pop(); mainPage.accountValue=status_message.acc}  catch(e) { } }
     }
 
 }

@@ -39,7 +39,7 @@ Page {
                     iconWidth: 40
                     iconHeight: 40
                     iconSource: constant.momentsLabelIcon
-                    labelText:  qsTr("Moments")
+                    labelText:  qsTr("朋友圈")
                     fontPointSize: constant.middleFontPointSize + 1.0
 
                     Image {
@@ -70,7 +70,7 @@ Page {
                             iconWidth: 40
                             iconHeight: 40
                             iconSource: constant.scanQRCodeLabelIcon
-                            labelText:  qsTr("Scan QR Code")
+                            labelText:  qsTr("二维码")
                             fontPointSize: constant.middleFontPointSize + 1.0
                         }
 
@@ -86,7 +86,7 @@ Page {
                             iconWidth: 40
                             iconHeight: 40
                             iconSource: constant.shakeLabelIcon
-                            labelText:  qsTr("Shake")
+                            labelText:  qsTr("摇一摇")
                             fontPointSize: constant.middleFontPointSize + 1.0
                         }
                     }
@@ -107,7 +107,7 @@ Page {
                             iconWidth: 40
                             iconHeight: 40
                             iconSource: constant.peopleNearbyLabelIcon
-                            labelText:  qsTr("People Nearby")
+                            labelText:  qsTr("附近的人")
                             fontPointSize: constant.middleFontPointSize + 1.0
                         }
 
@@ -123,7 +123,7 @@ Page {
                             iconWidth: 40
                             iconHeight: 40
                             iconSource: constant.driftBottleLabelIcon
-                            labelText:  qsTr("Drift Bottle")
+                            labelText:  qsTr("漂流瓶")
                             fontPointSize: constant.middleFontPointSize + 1.0
                         }
                     }
@@ -135,7 +135,7 @@ Page {
                     iconWidth: 40
                     iconHeight: 40
                     iconSource: constant.gamesLabelIcon
-                    labelText:  qsTr("Games")
+                    labelText:  qsTr("游戏")
                     fontPointSize: constant.middleFontPointSize + 1.0
                 } // First Group
             } // Main ColumnLayout

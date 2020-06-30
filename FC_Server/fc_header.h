@@ -36,6 +36,8 @@
 //part three -- profile about
 //#define FC_ACCOUNT_LENGTH unsigned(6)
 #define FC_PROFILE              unsigned(1<<29)
+#define FC_REGISTER             unsigned(FC_PROFILE | 1<<1)       //注册
+#define FC_REGISTER_R           unsigned(FC_PROFILE | 1<<2)       //注册结果
 #define FC_SIGN_IN              unsigned(FC_PROFILE | 1<<3)       //login request
 #define FC_SIGN_IN_R            unsigned(FC_PROFILE | 1<<4)       //login result
 #define FC_SELF_MES             unsigned(FC_PROFILE | 1<<5)       //self message

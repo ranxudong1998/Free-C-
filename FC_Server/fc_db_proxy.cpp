@@ -85,6 +85,17 @@ bool DbBroker::add_friends(const QString &user_id, const QString &friends_id)
 
 bool DbBroker::serach_friend(const QString &account)
 {
-//    QString query = ""
+    //    QString query = ""
+}
+
+bool DbBroker::add_user(const QString &nick, const QString &pass, const QString &acc)
+{
+    //insert into account_info (account,password) values ('12345','45678')
+    QString query1 ="insert into account_info (account,password) values ('"+acc+"','"+pass+"')"; //插入在用户表中
+    //insert into user_message_info(account,nickname,sign) values('123456','LLOIU','');
+    QString query2 = "insert into user_message_info(account,nickname,sign) values('"+acc+"','"+nick+"','')";
+    //insert into group_info(user_id,group_name) values('123456','friends');
+    QString query3 = "insert into group_info(user_id,group_name) values('"+acc+"','friends')";
+    return db->insert(query1) && db->insert(query2) && db->insert(query3);
 }
 

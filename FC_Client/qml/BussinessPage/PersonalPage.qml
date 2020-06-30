@@ -90,7 +90,7 @@ Page {
                             iconWidth: 40
                             iconHeight: 40
                             iconSource: constant.myPostsLabelIcon
-                            labelText:  qsTr("My Posts")
+                            labelText:  qsTr("相册")
                             fontPointSize: constant.middleFontPointSize + 1.0
                         }
 
@@ -106,7 +106,7 @@ Page {
                             iconWidth: 40
                             iconHeight: 40
                             iconSource: constant.favoritesLabelIcon
-                            labelText:  qsTr("Favorites")
+                            labelText:  qsTr("收藏")
                             fontPointSize: constant.middleFontPointSize + 1.0
                         }
                     }
@@ -118,7 +118,7 @@ Page {
                     iconWidth: 40
                     iconHeight: 40
                     iconSource: constant.walletLabelIcon
-                    labelText:  qsTr("Wallet")
+                    labelText:  qsTr("钱包")
                     fontPointSize: constant.middleFontPointSize + 1.0
                 }
 
@@ -128,10 +128,10 @@ Page {
                     iconWidth: 40
                     iconHeight: 40
                     iconSource: constant.settingsLabelIcon
-                    labelText:  qsTr("Settings")
+                    labelText:  qsTr("设置")
                     fontPointSize: constant.middleFontPointSize + 1.0
                     onClicked: {
-                        __PushPage(Qt.resolvedUrl("./Personal/SettingsPage.qml"), {} ); //压入一个新的界面
+//                        __PushPage(Qt.resolvedUrl("./Personal/SettingsPage.qml"), {} ); //压入一个新的界面
                     }
                 }
             }

@@ -137,6 +137,15 @@ void FC_Friends_Handle::delete_friend(const QString &team, const QString &item)
         }
     }
 
+    //删除本地接口中的好友信息
+    for(auto it = _client->get_item().begin();it != _client->get_item().end();)
+    {
+        if(it->first == item.toStdString())
+            it = _client->get_item().erase(it);
+        else
+            it++;
+    }
+
     FC_Message* msg = new FC_Message;
     msg->set_message_type(FC_DELETE_FRIENDS);
     msg->set_body_length(FC_ACC_LEN*2);
@@ -171,6 +180,8 @@ void FC_Friends_Handle::validation_request(const QString &result)
             }
         }
 
+        string acc = buddy->account().toStdString();
+        _client->set_item(acc,item);
         FC_Message* message = new FC_Message;
         message->set_message_type(FC_FRIENDS_ADD_R);
         char* status = (char*) malloc(3);
@@ -244,7 +255,7 @@ void FC_Friends_Handle::refresh_friends_list(const string &msg)
     item->setSign(QString::fromLocal8Bit(sign.c_str()));
     item->setGender(QString::fromLocal8Bit(sex.c_str()));
 
-
+    _client->set_item(acc,item);
     for(int i=0;i<_model->teamCount();i++)
     {
         qDebug()<<_model->team(i)->teamname();
